@@ -73,8 +73,20 @@
             text-decoration: none !important;
         }
         .sidebar:hover .sidebar-link { justify-content: flex-start; padding-left: 2rem; }
-        .sidebar-link:hover, .sidebar-link.active { color: #fff; background: var(--glass); }
-        .sidebar-link.active { border-right: 4px solid #3b82f6; color: #3b82f6; }
+        .sidebar-link:hover, .sidebar-link.active { background: var(--glass); }
+        
+        /* Colores por Categoría */
+        #nav-artists.active { border-right: 4px solid #3b82f6; color: #3b82f6; }
+        #nav-artists:hover { color: #3b82f6; }
+
+        #nav-shop.active { border-right: 4px solid #ef4444; color: #ef4444; }
+        #nav-shop:hover { color: #ef4444; }
+
+        #nav-extras.active { border-right: 4px solid #f59e0b; color: #f59e0b; }
+        #nav-extras:hover { color: #f59e0b; }
+
+        #nav-sustainability.active { border-right: 4px solid #10b981; color: #10b981; }
+        #nav-sustainability:hover { color: #10b981; }
 
         /* MOBILE NAV */
         .mobile-header {
@@ -260,7 +272,7 @@
 
             <!-- SECCIÓN: TIENDA -->
             <section id="shop-section" class="content-overlay">
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-12">MUSIC <span class="text-blue-500">STORE</span></h1>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-12">MUSIC <span class="text-red-500">STORE</span></h1>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="shop-container">
                     <!-- Productos dinámicos -->
                 </div>
@@ -268,7 +280,7 @@
 
             <!-- SECCIÓN: EXTRAS -->
             <section id="extras-section" class="content-overlay">
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-12">EXTRAS & <span class="text-purple-500">EVENTS</span></h1>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-12">EXTRAS & <span class="text-amber-500">EVENTS</span></h1>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                     <!-- Eventos dinámicos -->
                 </div>
