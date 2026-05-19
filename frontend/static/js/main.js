@@ -2,6 +2,53 @@ let currentArtistIndex = 0;
 let artistsData = [];
 let productsData = [];
 let eventsData = [];
+let cart = []; // Array para guardar los preductos que se desean comprar
+
+// MOCK DATA temporal para provar el funcionamiento de los productos
+const mockProducts = [
+    { 
+        product_id: 1, 
+        product_name: "Álbum 'Echoes en la Noche'", 
+        product_type: "album", 
+        price: 15.99, 
+        image_url: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=400" 
+    },
+    { 
+        product_id: 2, 
+        product_name: "Vinilo Edición Especial Clásicos", 
+        product_type: "vinyl", 
+        price: 35.50, 
+        image_url: "https://images.unsplash.com/photo-1538688423619-a81d3f23454b?auto=format&fit=crop&q=80&w=400" 
+    },
+    { 
+        product_id: 3, 
+        product_name: "Camiseta Tour 2024 (Negra)", 
+        product_type: "clothing", 
+        price: 25.00, 
+        image_url: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&q=80&w=400" 
+    },
+    { 
+        product_id: 4, 
+        product_name: "Tote Bag Sostenible Algodón", 
+        product_type: "tote_bag", 
+        price: 12.00, 
+        image_url: "https://images.unsplash.com/photo-1597423235375-14f7623a31eb?auto=format&fit=crop&q=80&w=400" 
+    },
+    { 
+        product_id: 5, 
+        product_name: "Sudadera SoundScape Premium", 
+        product_type: "clothing", 
+        price: 45.00, 
+        image_url: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=400" 
+    },
+    { 
+        product_id: 6, 
+        product_name: "Pin Metálico Logo Banda", 
+        product_type: "pin", 
+        price: 5.50, 
+        image_url: "https://images.unsplash.com/photo-1611078716388-3485ba8051a8?auto=format&fit=crop&q=80&w=400" 
+    }
+];
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('SoundScape: Inicializando aplicación...');
@@ -72,11 +119,24 @@ async function fetchArtists() {
 async function fetchProducts() {
     try {
         const response = await fetch('http://localhost:5000/api/shop/');
-        if (!response.ok) throw new Error('API no disponible');
-        productsData = await response.json();
-        renderProducts();
+        
+        // Si el backend responde pero devuelve un array vacío (la BD no tiene datos aún)
+        const data = await response.json();
+        
+        if (data.length === 0) {
+            console.warn('La base de datos está vacía. Cargando datos simulados (Mock)...');
+            productsData = mockProducts;
+        } else {
+            productsData = data;
+        }
+        
+        renderProducts(productsData);
+
     } catch (error) {
-        console.warn('Cargando mock data para tienda...');
+        // Si el backend ni siquiera está encendido, caemos aquí
+        console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
+        productsData = mockProducts;
+        renderProducts(productsData);
     }
 }
 
@@ -107,26 +167,6 @@ function renderArtistSlides() {
             </div>
         </div>
     `).join('');
-}
-
-function renderProducts() {
-    const container = document.getElementById('shop-container');
-    if (!container) return;
-
-    container.innerHTML = productsData.map(product => `
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group">
-            <img src="${product.image_url}" class="w-full aspect-square object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" alt="${product.product_name}">
-            <h3 class="font-bold text-lg">${product.product_name}</h3>
-            <p class="text-slate-400 text-sm mb-4">${product.product_type}</p>
-            <div class="flex items-center justify-between">
-                <span class="text-2xl font-black">${product.price}€</span>
-                <button class="p-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors">
-                    <i data-lucide="shopping-cart" size="20"></i>
-                </button>
-            </div>
-        </div>
-    `).join('');
-    if (window.lucide) lucide.createIcons();
 }
 
 function renderEvents() {
@@ -238,4 +278,154 @@ function updateSlide(newIndex) {
     currentArtistIndex = newIndex;
     const nextSlide = document.getElementById(`slide-${currentArtistIndex}`);
     if (nextSlide) nextSlide.classList.add('active');
+}
+
+// LÓGICA SHOP
+
+// Por defecto, usa todos los productos (productsData).
+function renderProducts(productsToRender = productsData) {
+    const container = document.getElementById('shop-container');
+    if (!container) return;
+
+    // Si no hay productos en la categoría, mostramos un mensaje
+    if (productsToRender.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 col-span-full text-center py-10">No hay productos disponibles en esta categoría.</p>`;
+        return;
+    }
+
+    // Inyectamos el HTML. Nota que añadimos onclick="addToCart(...)" al botón rojo.
+    container.innerHTML = productsToRender.map(product => `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group flex flex-col justify-between">
+            <div>
+                <img src="${product.image_url}" class="w-full aspect-square object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" alt="${product.product_name}">
+                <h3 class="font-bold text-lg leading-tight mb-1">${product.product_name}</h3>
+                <p class="text-slate-400 text-xs font-semibold tracking-widest mb-4 uppercase">${product.product_type.replace('_', ' ')}</p>
+            </div>
+            <div class="flex items-center justify-between mt-4">
+                <span class="text-2xl font-black">${product.price}€</span>
+                <button class="p-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors" onclick="addToCart(${product.product_id})">
+                    <i data-lucide="shopping-cart" size="20"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+    
+    // Es vital recargar los iconos de Lucide después de modificar el DOM
+    if (window.lucide) lucide.createIcons();
+}
+
+// Filtra los productos comparando el parámetro con el product_type
+function filterProducts(type) {
+    if (type === 'all') {
+        renderProducts(productsData); // Muestra todos
+    } else {
+        const filtered = productsData.filter(p => p.product_type === type);
+        renderProducts(filtered); // Muestra solo los de la categoría
+    }
+}
+
+// LÓGICA CARRITO
+
+function openCart() {
+    const sidebar = document.getElementById("cartSidebar");
+    const overlay = document.getElementById("cart-overlay");
+    
+    // Mostramos el overlay con una transición suave
+    overlay.classList.remove("hidden");
+    setTimeout(() => overlay.classList.remove("opacity-0"), 10);
+    
+    // Deslizamos el sidebar hacia adentro
+    sidebar.classList.remove("translate-x-full");
+    
+    // Renderizamos los datos más recientes
+    renderCart();
+}
+
+function closeCart() {
+    const sidebar = document.getElementById("cartSidebar");
+    const overlay = document.getElementById("cart-overlay");
+    
+    // Ocultamos deslizando hacia la derecha
+    sidebar.classList.add("translate-x-full");
+    
+    // Ocultamos el overlay suavemente
+    overlay.classList.add("opacity-0");
+    setTimeout(() => overlay.classList.add("hidden"), 300);
+}
+
+// Modificamos ligeramente addToCart para que abra el carrito al añadir un producto
+function addToCart(productId) {
+    const product = productsData.find(p => p.product_id === productId);
+    if (!product) return;
+
+    const existingItem = cart.find(item => item.product_id === productId);
+    
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+
+    updateCartCounter();
+    renderCart(); // Actualiza el HTML del carrito
+    openCart();   // ¡Despliega el carrito automáticamente para que el usuario vea su acción!
+}
+
+// Renderiza la lista dentro del Sidebar
+function renderCart() {
+    const list = document.getElementById("cartItems");
+    const totalElement = document.getElementById("cartTotal");
+    if (!list) return;
+
+    list.innerHTML = "";
+    let total = 0;
+
+    // Si el carrito está vacío
+    if (cart.length === 0) {
+        list.innerHTML = `<p class="text-center text-slate-500 mt-10">Tu carrito está vacío.</p>`;
+        totalElement.innerText = "0.00€";
+        return;
+    }
+
+    // Dibujamos cada item fusionando tu idea del `forEach` con Tailwind
+    cart.forEach((item) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        
+        list.innerHTML += `
+            <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
+                <img src="${item.image_url}" alt="${item.product_name}" class="w-16 h-16 object-cover rounded-lg">
+                <div class="flex-grow">
+                    <h4 class="font-bold text-sm line-clamp-1">${item.product_name}</h4>
+                    <p class="text-slate-400 text-xs">${item.price}€ x ${item.quantity}</p>
+                </div>
+                <div class="font-black text-lg">${itemTotal.toFixed(2)}€</div>
+            </div>
+        `;
+    });
+    
+    // Actualizamos el precio final
+    totalElement.innerText = total.toFixed(2) + "€";
+    
+    // Refrescar iconos si es necesario
+    if (window.lucide) lucide.createIcons();
+}
+
+function goToOrders() {
+    if (cart.length === 0) {
+        alert("¡Añade productos antes de procesar el pedido!");
+        return;
+    }
+    // Por ahora mostramos un alert, luego podrás descomentar la redirección
+    alert("Redirigiendo a pasarela de pago...");
+    // window.location.href = "shop/orders.html";
+}
+
+// Actualiza el contador del carrito
+function updateCartCounter() {
+    const counter = document.getElementById('cart-count');
+    if (counter) {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        counter.innerText = totalItems;
+    }
 }
