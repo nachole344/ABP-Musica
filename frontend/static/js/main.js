@@ -15,19 +15,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // NAVEGACIÓN GLOBAL (Sidebar y Mobile)
 function showSection(sectionId) {
-    const sections = ['artists', 'shop', 'extras', 'sustainability'];
+    const sections = ['home', 'artists', 'shop', 'extras', 'sustainability'];
     
     sections.forEach(s => {
         const element = document.getElementById(s + '-section');
         const navLink = document.getElementById('nav-' + s);
-        if (element) element.classList.remove('active');
+        
+        if (element) {
+            element.classList.remove('active');
+            // Aseguramos que las secciones de pantalla completa se oculten correctamente
+            if (element.classList.contains('viewport-section')) {
+                element.style.display = 'none';
+            }
+        }
         if (navLink) navLink.classList.remove('active');
     });
 
     const activeSection = document.getElementById(sectionId + '-section');
     const activeNavLink = document.getElementById('nav-' + sectionId);
 
-    if (activeSection) activeSection.classList.add('active');
+    if (activeSection) {
+        activeSection.classList.add('active');
+        // Si es una sección de pantalla completa, usamos flex para centrar
+        if (activeSection.classList.contains('viewport-section')) {
+            activeSection.style.display = 'flex';
+        }
+    }
     if (activeNavLink) activeNavLink.classList.add('active');
 
     // Cerrar el catálogo si se cambia de sección
@@ -53,8 +66,6 @@ async function fetchArtists() {
         renderArtistSlides();
     } catch (error) {
         console.warn('Cargando mock data para artistas...');
-        // Mock data omitted for brevity in replace, but keeping it if needed
-        // For now, I'll just leave the real fetch and handle error
     }
 }
 
