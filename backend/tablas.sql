@@ -199,10 +199,10 @@ user_id INT GENERATED ALWAYS AS IDENTITY,
 username VARCHAR(50),
 password VARHCAR(50),
 
-CONSTRAINT pk_users_user_id PRIMARY KEY (order_iuser_id),
+CONSTRAINT pk_users_user_id PRIMARY KEY (user_id),
 
 CONSTRAINT nn_users_username CHECK (username IS NOT NULL),
 CONSTRAINT nn_users_password CHECK (password IS NOT NULL),
 
-CONSTRAINT uk_cusers_username UNIQUE (username)
+CONSTRAINT uk_users_username UNIQUE (username)
 );
