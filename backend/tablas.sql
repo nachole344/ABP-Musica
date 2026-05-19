@@ -197,7 +197,7 @@ CONSTRAINT fk_order_items_product_id FOREIGN KEY (product_id) REFERENCES product
 CREATE TABLE IF NOT EXISTS users (
 user_id INT GENERATED ALWAYS AS IDENTITY,
 username VARCHAR(50),
-password VARHCAR(50),
+password VARCHAR(50),
 
 CONSTRAINT pk_users_user_id PRIMARY KEY (user_id),
 
