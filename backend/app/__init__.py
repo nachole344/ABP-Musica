@@ -16,17 +16,22 @@ def create_app():
     # Configuration
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'postgresql://user:password@localhost:5432/artists_db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-123')
     
     db.init_app(app)
-    CORS(app)
+    CORS(app, supports_credentials=True)
     
     # Register blueprints
     from .routes.artists import artists_bp
     from .routes.shop import shop_bp
     from .routes.events import events_bp
+    from .routes.auth import auth_bp
+    from .routes.admin import admin_bp
     
     app.register_blueprint(artists_bp, url_prefix='/api/artists')
     app.register_blueprint(shop_bp, url_prefix='/api/shop')
     app.register_blueprint(events_bp, url_prefix='/api/events')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(admin_bp, url_prefix='/admin')
     
     return app

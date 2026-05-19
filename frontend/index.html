@@ -267,6 +267,22 @@
                 <i data-lucide="leaf" class="text-emerald-500"></i>
                 <span class="nav-label text-emerald-500">Eco</span>
             </a>
+
+            <!-- BOTÓN LOGIN (Inferior) -->
+            <div class="mt-auto w-100">
+                <a id="nav-admin-panel" class="sidebar-link hidden" href="http://localhost:5000/admin/">
+                    <i data-lucide="layout-dashboard" class="text-blue-500"></i>
+                    <span class="nav-label text-blue-500">Panel Admin</span>
+                </a>
+                <a id="nav-login" class="sidebar-link" onclick="showLogin()">
+                    <i data-lucide="user"></i>
+                    <span class="nav-label" id="login-label">Iniciar Sesión</span>
+                </a>
+                <a id="nav-logout" class="sidebar-link hidden" onclick="handleLogout()">
+                    <i data-lucide="log-out"></i>
+                    <span class="nav-label">Cerrar Sesión</span>
+                </a>
+            </div>
         </aside>
 
         <!-- MOBILE HEADER & MENU -->
@@ -345,14 +361,32 @@
                     <!-- El contenido se generará dinámicamente -->
                 </div>
             </section>
+            <!-- SECCIÓN: LOGIN -->
+            <section id="login-section" class="content-overlay flex-col items-center justify-center">
+                <div class="glass-card p-10 rounded-3xl border border-white/10 w-full max-w-md">
+                    <h2 class="text-4xl font-black mb-8 text-center">USER <span class="text-blue-500">LOGIN</span></h2>
+                    <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-400 mb-2">USUARIO</label>
+                            <input type="text" id="login-username" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-400 mb-2">CONTRASEÑA</label>
+                            <input type="password" id="login-password" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
+                        </div>
+                        <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02]">
+                            ENTRAR AL PANEL
+                        </button>
+                    </form>
+                    <p id="login-error" class="mt-4 text-red-500 text-center font-bold hidden">Credenciales incorrectas</p>
+                    <button onclick="hideLogin()" class="mt-6 w-full text-slate-500 hover:text-white transition-colors text-sm font-bold">CANCELAR</button>
+                </div>
+            </section>
         </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/main.js"></script>
-</body>
-</html>
-1.1"></script>
 </body>
 </html>

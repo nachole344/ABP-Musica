@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Edit" if album else "New" }} Album{% endblock %}
+
+{% block content %}
+<h1>{{ "Edit" if album else "New" }} Album</h1>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="mb-3">
+        <label class="form-label">Artist</label>
+        <select name="artist_id" class="form-select" required>
+            <option value="">Select...</option>
+            {% for a in artists %}
+                <option value="{{ a.artist_id }}" {{ "selected" if album and album.artist_id == a.artist_id else "" }}>{{ a.artist_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Album Title</label>
+        <input type="text" name="album_title" class="form-control" value="{{ album.album_title if album else '' }}" required>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Release Date</label>
+            <input type="date" name="release_date" class="form-control" value="{{ album.release_date if album else '' }}" required>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Total Tracks</label>
+            <input type="number" name="total_track" class="form-control" value="{{ album.total_track if album else '' }}" required>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Cover (URL)</label>
+        <input type="url" name="cover_album" class="form-control" value="{{ album.cover_album if album else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Spotify (URL)</label>
+        <input type="url" name="spotify" class="form-control" value="{{ album.spotify if album else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">MusicBrainz Album ID (UUID)</label>
+        <input type="text" name="mb_album_id" class="form-control" value="{{ album.mb_album_id if album else '' }}" required>
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('main.list_albums') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

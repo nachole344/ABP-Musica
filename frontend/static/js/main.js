@@ -45,6 +45,8 @@ function showSection(sectionId) {
 
     // Cerrar el catálogo si se cambia de sección
     closeCatalog();
+    // También ocultamos el login si se cambia de sección
+    hideLogin();
 
     if (window.lucide) lucide.createIcons();
 }
@@ -239,3 +241,106 @@ function updateSlide(newIndex) {
     const nextSlide = document.getElementById(`slide-${currentArtistIndex}`);
     if (nextSlide) nextSlide.classList.add('active');
 }
+
+// LÓGICA DE LOGIN Y ADMIN
+function showLogin() {
+    const loginSection = document.getElementById('login-section');
+    if (loginSection) {
+        loginSection.classList.add('active');
+        loginSection.style.display = 'flex';
+    }
+}
+
+function hideLogin() {
+    const loginSection = document.getElementById('login-section');
+    if (loginSection) {
+        loginSection.classList.remove('active');
+        setTimeout(() => {
+            loginSection.style.display = 'none';
+        }, 300);
+    }
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+    const username = document.getElementById('login-username').value;
+    const password = document.getElementById('login-password').value;
+    const errorMsg = document.getElementById('login-error');
+
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            updateUIForLoggedInUser(data.user);
+            hideLogin();
+        } else {
+            if (errorMsg) errorMsg.classList.remove('hidden');
+        }
+    } catch (error) {
+        console.error('Error en login:', error);
+        alert('Error al conectar con el servidor.');
+    }
+}
+
+async function handleLogout() {
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/logout', { method: 'POST' });
+        if (response.ok) {
+            updateUIForLoggedOutUser();
+        }
+    } catch (error) {
+        console.error('Error en logout:', error);
+    }
+}
+
+async function checkLoginStatus() {
+    try {
+        const response = await fetch('http://localhost:5000/api/auth/check');
+        const data = await response.json();
+        if (data.logged_in) {
+            updateUIForLoggedInUser(data.user);
+        } else {
+            updateUIForLoggedOutUser();
+        }
+    } catch (error) {
+        console.warn('No se pudo verificar el estado del login.');
+    }
+}
+
+function updateUIForLoggedInUser(user) {
+    const adminBtn = document.getElementById('nav-admin-panel');
+    const loginBtn = document.getElementById('nav-login');
+    const logoutBtn = document.getElementById('nav-logout');
+    const loginLabel = document.getElementById('login-label');
+
+    if (loginLabel) loginLabel.innerText = user.username;
+    if (loginBtn) loginBtn.classList.add('active');
+    if (logoutBtn) logoutBtn.classList.remove('hidden');
+    
+    // Por ahora, asumimos que si puede loguearse es admin para mostrar el botón
+    // pero lo hacemos condicional por si luego quieres añadir roles.
+    if (adminBtn) adminBtn.classList.remove('hidden');
+}
+
+function updateUIForLoggedOutUser() {
+    const adminBtn = document.getElementById('nav-admin-panel');
+    const loginBtn = document.getElementById('nav-login');
+    const logoutBtn = document.getElementById('nav-logout');
+    const loginLabel = document.getElementById('login-label');
+
+    if (loginLabel) loginLabel.innerText = 'Iniciar Sesión';
+    if (loginBtn) loginBtn.classList.remove('active');
+    if (logoutBtn) logoutBtn.classList.add('hidden');
+    if (adminBtn) adminBtn.classList.add('hidden');
+}
+
+// Llamar al check al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    // ... código existente ...
+    checkLoginStatus();
+});
