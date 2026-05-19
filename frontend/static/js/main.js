@@ -3,6 +3,54 @@ let artistsData = [];
 let productsData = [];
 let eventsData = [];
 
+const mockEvents = [
+    {
+        event_id: 1,
+        artist_id: 1,
+        event_name: "Nova Pulse — Live in Barcelona",
+        event_type: "CONCERT",
+        event_date: "2025-06-12",
+        location: "Sala Apolo, Barcelona",
+        poster: "https://images.unsplash.com/photo-1518972559570-7cc1309f3229"
+    },
+    {
+        event_id: 2,
+        artist_id: 2,
+        event_name: "Echo Drift — European Tour",
+        event_type: "TOUR",
+        event_date: "2025-09-03",
+        location: "O2 Arena, London",
+        poster: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2"
+    },
+    {
+        event_id: 3,
+        artist_id: 3,
+        event_name: "SoundScape Festival 2025",
+        event_type: "FESTIVAL",
+        event_date: "2025-08-21",
+        location: "Parc del Fòrum, Barcelona",
+        poster: "https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf"
+    },
+    {
+        event_id: 4,
+        artist_id: null,
+        event_name: "Industria Musical — Mesa Redonda",
+        event_type: "TALK",
+        event_date: "2025-11-10",
+        location: "Fira Barcelona — Hall 5",
+        poster: "https://images.unsplash.com/photo-1515165562835-c4c1b4d1f4d5"
+    },
+    {
+        event_id: 5,
+        artist_id: 1,
+        event_name: "Nova Pulse — Meet & Greet",
+        event_type: "EXTRA",
+        event_date: "2025-06-13",
+        location: "FNAC Triangle, Barcelona",
+        poster: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
+    }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
     console.log('SoundScape: Inicializando aplicación...');
     if (window.lucide) {
@@ -84,10 +132,11 @@ async function fetchEvents() {
     try {
         const response = await fetch('http://localhost:5000/api/events/');
         if (!response.ok) throw new Error('API no disponible');
-        eventsData = await response.json();
+        eventsData = mockEvents;
         renderEvents();
     } catch (error) {
         console.warn('Cargando mock data para eventos...');
+        eventsData = mockEvents;
     }
 }
 
