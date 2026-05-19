@@ -12,3 +12,6 @@ node_modules/
 # IDEs
 .vscode/
 .idea/
+
+# PDFs
+*.pdf
