@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Edit" if artist else "New" }} Artist{% endblock %}
+
+{% block content %}
+<h1>{{ "Edit" if artist else "New" }} Artist</h1>
+
+<form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Stage Name</label>
+            <input type="text" name="artist_name" class="form-control" value="{{ artist.artist_name if artist else '' }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Real Name</label>
+            <input type="text" name="real_name" class="form-control" value="{{ artist.real_name if artist else '' }}" required>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Birth Date</label>
+            <input type="date" name="birth_date" class="form-control" value="{{ artist.birth_date if artist else '' }}" required>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Debut</label>
+            <input type="date" name="debut" class="form-control" value="{{ artist.debut if artist else '' }}" required>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Country</label>
+            <input type="text" name="country" class="form-control" value="{{ artist.country if artist else '' }}" required>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Social Media (URL)</label>
+        <input type="url" name="social_media" class="form-control" value="{{ artist.social_media if artist else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Image (URL)</label>
+        <input type="url" name="image" class="form-control" value="{{ artist.image if artist else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">MusicBrainz ID (UUID)</label>
+        <input type="text" name="mb_id" class="form-control" value="{{ artist.mb_id if artist else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="3">{{ artist.description if artist else '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('main.list_artists') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
