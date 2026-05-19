@@ -75,7 +75,34 @@
         .sidebar:hover .sidebar-link { justify-content: flex-start; padding-left: 2rem; }
         .sidebar-link:hover, .sidebar-link.active { background: var(--glass); }
         
+        /* Ajustes para el logo */
+        .sidebar-logo-hover { display: none; opacity: 0; }
+        .sidebar:hover .sidebar-logo-default { display: none; }
+        .sidebar:hover .sidebar-logo-hover { display: block; opacity: 1; transition: opacity 0.3s ease; }
+
+        /* Estilos para la sección Home */
+        #home-section {
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+        }
+        .home-logo-large {
+            width: 450px;
+            max-width: 80vw;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 0.1));
+            animation: float 6s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
         /* Colores por Categoría */
+        #nav-home.active { border-right: 4px solid #fff; color: #fff; }
+        #nav-home:hover { color: #fff; }
+
         #nav-artists.active { border-right: 4px solid #3b82f6; color: #3b82f6; }
         #nav-artists:hover { color: #3b82f6; }
 
@@ -121,15 +148,16 @@
             overflow: hidden;
         }
 
-        /* FULLSCREEN ARTIST SECTION */
-        .artist-viewport {
+        /* FULLSCREEN SECTIONS */
+        .viewport-section {
             position: absolute;
             inset: 0;
             height: 100%;
             width: 100%;
+            display: none;
         }
-        
-        /* ... resto de estilos de artist-slide, video-bg, nav-arrow, content-overlay sin cambios ... */
+        .viewport-section.active { display: flex; }
+
         .artist-slide {
             position: absolute;
             inset: 0;
@@ -200,7 +228,7 @@
             .arrow-left { left: 10px; }
             .artist-info h2 { font-size: 15vw; }
             .content-overlay { 
-                padding: 7rem 1.5rem 2rem 1.5rem; /* Aumento de padding superior para evitar solape con header */
+                padding: 7rem 1.5rem 2rem 1.5rem;
             }
         }
         
@@ -214,10 +242,16 @@
     <div id="app-wrapper">
         <!-- SIDEBAR (PC) -->
         <aside class="sidebar">
-            <div class="mb-10 text-blue-500">
-                <i data-lucide="music" size="32"></i>
+            <div class="mb-10 px-4 cursor-pointer" onclick="showSection('home')">
+                <img src="static/img/3.png" alt="SoundScape Logo" class="w-12 h-12 object-contain mx-auto sidebar-logo-default">
+                <img src="static/img/2.png" alt="SoundScape Logo" class="sidebar-logo-hover h-10 object-contain mx-auto">
             </div>
-            <a id="nav-artists" class="sidebar-link active" onclick="showSection('artists')">
+            
+            <a id="nav-home" class="sidebar-link active" onclick="showSection('home')">
+                <i data-lucide="home"></i>
+                <span class="nav-label">Home</span>
+            </a>
+            <a id="nav-artists" class="sidebar-link" onclick="showSection('artists')">
                 <i data-lucide="mic-2"></i>
                 <span class="nav-label">Artistas</span>
             </a>
@@ -237,9 +271,8 @@
 
         <!-- MOBILE HEADER & MENU -->
         <header class="mobile-header">
-            <div class="flex items-center gap-2 font-bold tracking-tighter text-lg">
-                <span class="p-1 bg-blue-600 rounded-lg text-white"><i data-lucide="music" size="18"></i></span>
-                SOUNDSCAPE
+            <div class="flex items-center gap-2 cursor-pointer" onclick="showSection('home')">
+                <img src="static/img/2.png" alt="SoundScape" class="h-8 object-contain">
             </div>
             <button class="p-2 text-white" onclick="toggleMobileMenu()">
                 <i data-lucide="menu"></i>
@@ -251,6 +284,7 @@
                 <i data-lucide="x" size="32"></i>
             </button>
             <nav class="flex flex-col gap-6 text-center mt-10">
+                <a class="text-4xl font-bold" onclick="showSection('home'); toggleMobileMenu()">Home</a>
                 <a class="text-4xl font-bold" onclick="showSection('artists'); toggleMobileMenu()">Artistas</a>
                 <a class="text-4xl font-bold" onclick="showSection('shop'); toggleMobileMenu()">Tienda</a>
                 <a class="text-4xl font-bold" onclick="showSection('extras'); toggleMobileMenu()">Extras</a>
@@ -260,8 +294,15 @@
 
         <!-- MAIN VIEWPORT -->
         <div id="main-content">
+            <!-- SECCIÓN: HOME -->
+            <section id="home-section" class="viewport-section active">
+                <div class="text-center">
+                    <img src="static/img/1.png" alt="SoundScape Logo" class="home-logo-large">
+                </div>
+            </section>
+
             <!-- SECCIÓN: ARTISTAS (FULLSCREEN CAROUSEL) -->
-            <section id="artists-section" class="artist-viewport">
+            <section id="artists-section" class="viewport-section">
                 <button class="nav-arrow arrow-left" onclick="prevArtist()"><i data-lucide="chevron-left"></i></button>
                 <button class="nav-arrow arrow-right" onclick="nextArtist()"><i data-lucide="chevron-right"></i></button>
                 
@@ -310,5 +351,8 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="static/js/main.js"></script>
+</body>
+</html>
+1.1"></script>
 </body>
 </html>
