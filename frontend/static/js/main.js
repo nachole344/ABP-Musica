@@ -137,7 +137,7 @@ function viewArtistCatalog(index) {
             
             <div class="col-lg-7 offset-lg-1">
                 <h3 class="text-2xl font-black mb-10 flex items-center gap-4 tracking-tighter">
-                    <i data-lucide="disc" class="text-blue-500"></i> DISCOGRAFÍA (ÁLBUMES & CANCIONES)
+                    <i data-lucide="disc" class="text-blue-500"></i> DISCOGRAFÍA
                 </h3>
                 <div class="space-y-16">
                     ${(artist.albums || []).map(album => `

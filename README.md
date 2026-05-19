@@ -67,6 +67,7 @@ Como es una aplicación estática (HTML puro + Tailwind + Bootstrap), puedes abr
 - [x] **Implementación visual de Sostenibilidad.**
 - [x] **Implementación visual de Extras (Tours y Series).**
 - [ ] Endpoints de lectura de Artistas (Backend - Python/Flask).
+- [ ] Implementación de Sistema de Usuarios (Login/Registro) - *Decisión: Requerido al finalizar compra*.
 - [ ] Conexión real de Tienda con la tabla `products` de la BBDD.
 - [ ] Conexión real de Extras con la tabla `events` de la BBDD.
 - [ ] Lógica del carrito de compra.
