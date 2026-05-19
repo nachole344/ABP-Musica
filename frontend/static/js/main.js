@@ -239,3 +239,20 @@ function updateSlide(newIndex) {
     const nextSlide = document.getElementById(`slide-${currentArtistIndex}`);
     if (nextSlide) nextSlide.classList.add('active');
 }
+
+
+//////////////////////////
+// EXTRAS: ///////////////
+// - conciertos //////////
+// - tours ///////////////
+// - festivales //////////
+// - eventos /////////////
+// - series tv/pelis /////
+// - empresas musicales //
+//////////////////////////
+
+// Mostrar Conciertos
+
+// Mostrar ...
+
+// Poner Reservas
