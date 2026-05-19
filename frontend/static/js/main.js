@@ -137,6 +137,7 @@ async function fetchEvents() {
     } catch (error) {
         console.warn('Cargando mock data para eventos...');
         eventsData = mockEvents;
+        renderEvents();
     }
 }
 
