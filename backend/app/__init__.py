@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from .init import db
+# Import models to register them with SQLAlchemy
+from . import models 
 
 def create_app():
     app = Flask(__name__)
@@ -20,6 +22,11 @@ def create_app():
     
     # Register blueprints
     from .routes.artists import artists_bp
+    from .routes.shop import shop_bp
+    from .routes.events import events_bp
+    
     app.register_blueprint(artists_bp, url_prefix='/api/artists')
+    app.register_blueprint(shop_bp, url_prefix='/api/shop')
+    app.register_blueprint(events_bp, url_prefix='/api/events')
     
     return app
