@@ -487,12 +487,13 @@
 
                 <div id="cart-overlay"
                     class="fixed inset-0 bg-black/80 z-[2000] hidden opacity-0 transition-opacity duration-300"
-                    onclick="closeCart()"></div>
+                    onclick="closeCart()">
+                </div>
 
                 <div id="cartSidebar"
                     class="fixed top-0 right-0 h-full w-full max-w-md bg-zinc-950 border-l border-white/10 z-[2010] transform translate-x-full transition-transform duration-300 flex flex-col">
                     <div class="flex items-center justify-between p-6 border-b border-white/10">
-                        <h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="shopping-bag"></i> Tu
+                        <h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="shopping-basket"></i> Tu
                             Carrito</h2>
                         <button onclick="closeCart()"
                             class="p-2 hover:bg-white/10 text-slate-400 hover:text-white rounded-full transition-colors"><i
@@ -507,9 +508,17 @@
                             <span class="text-lg text-slate-400">Total Estimado</span>
                             <span id="cartTotal" class="text-3xl font-black">0.00€</span>
                         </div>
-                        <button onclick="goToOrders()"
-                            class="w-full py-4 bg-white text-black font-bold rounded-xl hover:bg-slate-200 transition-colors">PROCESAR
-                            PEDIDO</button>
+                        <div>
+                            <button onclick="goToOrders()"
+                                class="w-3/4 py-4 bg-white text-black font-bold rounded-xl hover:bg-slate-200 transition-colors flex justify-center items-center">
+                                PROCESAR PEDIDO
+                            </button>
+
+                            <button onclick="emptyCart()"
+                                class="w-1/4 py-4 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors flex justify-center items-center">
+                                <p data-lucide="trash-2"></p>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
