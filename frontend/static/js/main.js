@@ -293,7 +293,7 @@ function renderProducts(productsToRender = productsData) {
         return;
     }
 
-    // Inyectamos el HTML. Nota que añadimos onclick="addToCart(...)" al botón rojo.
+    // Inyectamos el HTML.
     container.innerHTML = productsToRender.map(product => `
         <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group flex flex-col justify-between">
             <div>
@@ -428,4 +428,12 @@ function updateCartCounter() {
         const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
         counter.innerText = totalItems;
     }
+}
+
+function emptyCart() {
+    cart.length = 0;
+    document.getElementById("cartItems").innerHTML = '<p class="text-center text-slate-500 mt-10">Tu carrito está vacío.</p>';
+    updateCartCounter();
+    alert("Se ha vaciado el carrito");
+
 }
