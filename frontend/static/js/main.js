@@ -287,13 +287,13 @@ function renderProducts(productsToRender = productsData) {
     const container = document.getElementById('shop-container');
     if (!container) return;
 
-    // Si no hay productos en la categoría, mostramos un mensaje
+    // Si no hay productos que mostrar, se enseña un mensaje avisando de ello.
     if (productsToRender.length === 0) {
         container.innerHTML = `<p class="text-slate-400 col-span-full text-center py-10">No hay productos disponibles en esta categoría.</p>`;
         return;
     }
 
-    // Inyectamos el HTML.
+    // Se introduce todos los productos en el HTML
     container.innerHTML = productsToRender.map(product => `
         <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group flex flex-col justify-between">
             <div>
@@ -301,16 +301,22 @@ function renderProducts(productsToRender = productsData) {
                 <h3 class="font-bold text-lg leading-tight mb-1">${product.product_name}</h3>
                 <p class="text-slate-400 text-xs font-semibold tracking-widest mb-4 uppercase">${product.product_type.replace('_', ' ')}</p>
             </div>
-            <div class="flex items-center justify-between mt-4">
-                <span class="text-2xl font-black">${product.price}€</span>
-                <button class="p-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors" onclick="addToCart(${product.product_id})">
-                    <i data-lucide="shopping-cart" size="20"></i>
-                </button>
+            <div class="flex items-center justify-between mt-4 gap-2">
+                <span class="text-xl font-black">${product.price.toFixed(2)}€</span>
+                
+                <div class="flex items-center gap-1.5">
+                    <input type="number" id="qty-${product.product_id}" value="1" min="1" 
+                           class="w-12 p-1.5 bg-white/10 text-white rounded-lg text-center text-sm font-bold border border-white/10 focus:outline-none focus:border-red-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                    
+                    <button class="p-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors" onclick="addToCart(${product.product_id})">
+                        <i data-lucide="shopping-cart" size="20"></i>
+                    </button>
+                </div>
             </div>
         </div>
     `).join('');
     
-    // Es vital recargar los iconos de Lucide después de modificar el DOM
+    // Se recargan los iconos de Lucide para evitar errores.
     if (window.lucide) lucide.createIcons();
 }
 
@@ -353,22 +359,29 @@ function closeCart() {
     setTimeout(() => overlay.classList.add("hidden"), 300);
 }
 
-// Modificamos ligeramente addToCart para que abra el carrito al añadir un producto
 function addToCart(productId) {
     const product = productsData.find(p => p.product_id === productId);
     if (!product) return;
 
+    // Se revisa la cantidad que se quiere añadir
+    const qtyInput = document.getElementById(`qty-${productId}`);
+    const quantityToAdd = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
     const existingItem = cart.find(item => item.product_id === productId);
     
     if (existingItem) {
-        existingItem.quantity += 1;
+        // Si ya hay productos de este tipo en el carrito, se suman la cantidad seleccionada a la cantidad que habia en el carrito
+        existingItem.quantity += quantityToAdd;
     } else {
-        cart.push({ ...product, quantity: 1 });
+        cart.push({ ...product, quantity: quantityToAdd });
     }
 
+    // Se reinicia el contador
+    if (qtyInput) qtyInput.value = 1;
+
     updateCartCounter();
-    renderCart(); // Actualiza el HTML del carrito
-    openCart();   // ¡Despliega el carrito automáticamente para que el usuario vea su acción!
+    renderCart();
+    openCart();
 }
 
 // Renderiza la lista dentro del Sidebar
@@ -380,34 +393,41 @@ function renderCart() {
     list.innerHTML = "";
     let total = 0;
 
-    // Si el carrito está vacío
+    // Si el carrito está vacío, se muestra un mensaje indicandolo
     if (cart.length === 0) {
         list.innerHTML = `<p class="text-center text-slate-500 mt-10">Tu carrito está vacío.</p>`;
         totalElement.innerText = "0.00€";
         return;
     }
 
-    // Dibujamos cada item fusionando tu idea del `forEach` con Tailwind
+    // Se muestran todos los productos del carrito
     cart.forEach((item) => {
         const itemTotal = item.price * item.quantity;
         total += itemTotal;
         
         list.innerHTML += `
-            <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5">
-                <img src="${item.image_url}" alt="${item.product_name}" class="w-16 h-16 object-cover rounded-lg">
-                <div class="flex-grow">
-                    <h4 class="font-bold text-sm line-clamp-1">${item.product_name}</h4>
-                    <p class="text-slate-400 text-xs">${item.price}€ x ${item.quantity}</p>
+            <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5 justify-between">
+                <div class="flex items-center gap-3">
+                    <img src="${item.image_url}" alt="${item.product_name}" class="w-14 h-14 object-cover rounded-lg flex-shrink-0">
+                    <div>
+                        <h4 class="font-bold text-sm line-clamp-1 text-slate-200">${item.product_name}</h4>
+                        <p class="text-slate-400 text-xs">${item.price}€ x ${item.quantity}</p>
+                    </div>
                 </div>
-                <div class="font-black text-lg">${itemTotal.toFixed(2)}€</div>
+                
+                <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                    <span class="font-black text-sm">${itemTotal.toFixed(2)}€</span>
+                    <button onclick="removeFromCart(${item.product_id})" class="text-slate-500 hover:text-red-500 transition-colors p-1">
+                        <i data-lucide="trash" size="16"></i>
+                    </button>
+                </div>
             </div>
         `;
     });
     
-    // Actualizamos el precio final
     totalElement.innerText = total.toFixed(2) + "€";
     
-    // Refrescar iconos si es necesario
+    // Se reinician los iconos de Lucide para evitar errores
     if (window.lucide) lucide.createIcons();
 }
 
@@ -416,9 +436,13 @@ function goToOrders() {
         alert("¡Añade productos antes de procesar el pedido!");
         return;
     }
-    // Por ahora mostramos un alert, luego podrás descomentar la redirección
-    alert("Redirigiendo a pasarela de pago...");
-    // window.location.href = "shop/orders.html";
+    
+    if (confirm("¿Desea continuar con el pago?")) {
+        alert("Pago finalizado");
+        cart = [];
+        updateCartCounter();
+        renderCart();
+    }
 }
 
 // Actualiza el contador del carrito
@@ -430,10 +454,24 @@ function updateCartCounter() {
     }
 }
 
-function emptyCart() {
-    cart.length = 0;
-    document.getElementById("cartItems").innerHTML = '<p class="text-center text-slate-500 mt-10">Tu carrito está vacío.</p>';
+// Elimina un producto por completo del carrito independientemente de su cantidad
+function removeFromCart(productId) {
+    // Filtramos el array conservando todos los elementos excepto el que coincide con el ID
+    cart = cart.filter(item => item.product_id !== productId);
+    
+    // Sincronizamos el contador y volvemos a dibujar el carrito
     updateCartCounter();
-    alert("Se ha vaciado el carrito");
+    renderCart();
+}
 
+// Vacía por completo el carrito
+function emptyCart() {
+    if (cart.length === 0) return;
+    
+    // Pedimos confirmación al usuario para evitar clicks accidentales
+    if (confirm("¿Estás seguro de que deseas vaciar por completo tu carrito?")) {
+        cart = [];
+        updateCartCounter();
+        renderCart();
+    }
 }
