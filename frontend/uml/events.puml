@@ -1,0 +1,11 @@
+@startuml
+
+class Event {
+-int id
+--
++String title
++String date
++String location
+}
+
+@enduml
