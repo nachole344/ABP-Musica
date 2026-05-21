@@ -329,8 +329,8 @@
                     import plantumlEncoder from "https://cdn.jsdelivr.net/npm/plantuml-encoder/dist/plantuml-encoder.esm.js";
 
                     async function renderUML() {
-                        // 1. Cargar el archivo .puml
-                        const response = await fetch("./uml/events.puml");
+                        // 1. Cargar el .puml desde GitHub
+                        const response = await fetch("https://raw.githubusercontent.com/nachole344.github.io/ABP-Musica/frontend/uml/events.puml");
                         const umlText = await response.text();
 
                         // 2. Codificarlo
@@ -339,15 +339,15 @@
                         // 3. Construir la URL del servidor PlantUML
                         const url = "https://www.plantuml.com/plantuml/svg/" + encoded;
 
-                        // 4. Actualizar la imagen
+                        // 4. Mostrarlo
                         document.getElementById("uml").src = url;
                     }
 
-                    // Renderizar al cargar la página
                     renderUML();
                 </script>
 
                 <img id="uml" alt="Diagrama UML">
+
 
             </section>
 
