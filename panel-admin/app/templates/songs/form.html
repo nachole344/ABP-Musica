@@ -60,7 +60,7 @@
         <input type="text" name="mb_song_id" id="f-mb_song_id" class="form-control" value="{{ song.mb_song_id if song else '' }}" required>
     </div>
     <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="{{ url_for('admin.list_songs') }}" class="btn btn-secondary">Cancelar</a>
+    <a href="{{ url_for('main.list_songs') }}" class="btn btn-secondary">Cancelar</a>
 </form>
 {% endblock %}
 

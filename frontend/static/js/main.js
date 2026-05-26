@@ -62,7 +62,7 @@ function toggleMobileMenu() {
 // LÓGICA DE ARTISTAS (Carousel Full-Screen)
 async function fetchArtists() {
     try {
-        const response = await fetch('http://localhost:5000/api/artists/');
+        const response = await fetch('http://localhost:5000/api/artists/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
         artistsData = await response.json();
         renderArtistSlides();
@@ -73,7 +73,7 @@ async function fetchArtists() {
 
 async function fetchProducts() {
     try {
-        const response = await fetch('http://localhost:5000/api/shop/');
+        const response = await fetch('http://localhost:5000/api/shop/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
         productsData = await response.json();
         renderProducts();
@@ -84,7 +84,7 @@ async function fetchProducts() {
 
 async function fetchEvents() {
     try {
-        const response = await fetch('http://localhost:5000/api/events/');
+        const response = await fetch('http://localhost:5000/api/events/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
         eventsData = await response.json();
         renderEvents();
@@ -271,6 +271,7 @@ async function handleLogin(event) {
         const response = await fetch('http://localhost:5000/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ username, password })
         });
 
@@ -289,7 +290,10 @@ async function handleLogin(event) {
 
 async function handleLogout() {
     try {
-        const response = await fetch('http://localhost:5000/api/auth/logout', { method: 'POST' });
+        const response = await fetch('http://localhost:5000/api/auth/logout', { 
+            method: 'POST',
+            credentials: 'include'
+        });
         if (response.ok) {
             updateUIForLoggedOutUser();
         }
@@ -300,7 +304,9 @@ async function handleLogout() {
 
 async function checkLoginStatus() {
     try {
-        const response = await fetch('http://localhost:5000/api/auth/check');
+        const response = await fetch('http://localhost:5000/api/auth/check', {
+            credentials: 'include'
+        });
         const data = await response.json();
         if (data.logged_in) {
             updateUIForLoggedInUser(data.user);

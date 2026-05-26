@@ -64,7 +64,7 @@
         <input type="text" name="mb_album_id" id="f-mb_album_id" class="form-control" value="{{ album.mb_album_id if album else '' }}" required>
     </div>
     <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="{{ url_for('admin.list_albums') }}" class="btn btn-secondary">Cancelar</a>
+    <a href="{{ url_for('main.list_albums') }}" class="btn btn-secondary">Cancelar</a>
 </form>
 {% endblock %}
 

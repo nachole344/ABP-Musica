@@ -1,0 +1,548 @@
+{% extends "base.html" %}
+{% block title %}MusicBrainz Import{% endblock %}
+{% block content %}
+<div class="d-flex align-items-start justify-content-between mb-3">
+    <div>
+        <h2 class="mb-1 fw-bold"><i class="bi bi-cloud-download text-primary me-2"></i>MusicBrainz Importer</h2>
+        <p class="text-muted mb-0 small">Busca en MusicBrainz → revisa y edita los datos → guarda en tu base de datos</p>
+    </div>
+    <a href="{{ url_for('main.new_artist') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-pencil me-1"></i>Formulario manual
+    </a>
+</div>
+
+<div class="alert alert-info d-flex gap-2 align-items-start py-2 mb-4 small">
+    <i class="bi bi-info-circle-fill flex-shrink-0 mt-1"></i>
+    <span><strong>Flujo recomendado:</strong> Guarda el artista primero → luego sus álbumes → luego las canciones.</span>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="importTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active fw-semibold" id="artists-tab" data-bs-toggle="tab" data-bs-target="#panel-artists" type="button" role="tab">
+            <i class="bi bi-person-fill me-1"></i>Artistas
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="albums-tab" data-bs-toggle="tab" data-bs-target="#panel-albums" type="button" role="tab">
+            <i class="bi bi-disc-fill me-1"></i>Álbumes
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="songs-tab" data-bs-toggle="tab" data-bs-target="#panel-songs" type="button" role="tab">
+            <i class="bi bi-music-note-beamed me-1"></i>Canciones
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link fw-semibold" id="events-tab" data-bs-toggle="tab" data-bs-target="#panel-events" type="button" role="tab">
+            <i class="bi bi-calendar-event-fill me-1"></i>Eventos
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+
+    {# ARTISTAS #}
+    <div class="tab-pane fade show active" id="panel-artists" role="tabpanel">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre del artista</label>
+                        <input type="text" id="a-name" class="form-control" placeholder="ej. Radiohead">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">O UUID de MusicBrainz</label>
+                        <input type="text" id="a-mbid" class="form-control" placeholder="ej. a74b1b7f-...">
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-primary" onclick="searchArtist()"><i class="bi bi-search me-1"></i>Buscar</button>
+                    <button class="btn btn-outline-secondary" onclick="clearResults('a-results', 'artist')"><i class="bi bi-x-lg me-1"></i>Limpiar</button>
+                </div>
+            </div>
+        </div>
+        <div id="a-results"><div class="text-center text-muted py-5"><i class="bi bi-person-circle" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Ingresa un nombre o UUID para buscar.</p></div></div>
+    </div>
+
+    {# ÁLBUMES #}
+    <div class="tab-pane fade" id="panel-albums" role="tabpanel">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre del artista</label>
+                        <input type="text" id="al-artist-name" class="form-control" placeholder="ej. Radiohead">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">O UUID del artista</label>
+                        <input type="text" id="al-mbartist" class="form-control" placeholder="ej. a74b1b7f-...">
+                    </div>
+                </div>
+                <hr class="my-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre del álbum <span class="text-muted">(opcional)</span></label>
+                        <input type="text" id="al-album-name" class="form-control" placeholder="ej. OK Computer">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">O Release UUID <span class="text-muted">(opcional)</span></label>
+                        <input type="text" id="al-mbrelease" class="form-control" placeholder="ej. b84ee12a-...">
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-primary" onclick="searchAlbums()"><i class="bi bi-search me-1"></i>Buscar</button>
+                    <button class="btn btn-outline-secondary" onclick="clearResults('al-results', 'album')"><i class="bi bi-x-lg me-1"></i>Limpiar</button>
+                </div>
+            </div>
+        </div>
+        <div id="al-results"><div class="text-center text-muted py-5"><i class="bi bi-disc" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Ingresa un nombre de artista o UUID para ver sus álbumes.</p></div></div>
+    </div>
+
+    {# CANCIONES #}
+    <div class="tab-pane fade" id="panel-songs" role="tabpanel">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre del artista</label>
+                        <input type="text" id="s-artist-name" class="form-control" placeholder="ej. Radiohead">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">O UUID del artista</label>
+                        <input type="text" id="s-mbartist" class="form-control" placeholder="ej. a74b1b7f-...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre de la canción</label>
+                        <input type="text" id="s-song-name" class="form-control" placeholder="ej. Karma Police">
+                    </div>
+                </div>
+                <hr class="my-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Nombre del álbum</label>
+                        <input type="text" id="s-album-name" class="form-control" placeholder="ej. OK Computer">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">O Release UUID</label>
+                        <input type="text" id="s-mbrelease" class="form-control" placeholder="ej. b84ee12a-...">
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-primary" onclick="searchSongs()"><i class="bi bi-search me-1"></i>Buscar</button>
+                    <button class="btn btn-outline-secondary" onclick="clearResults('s-results', 'song')"><i class="bi bi-x-lg me-1"></i>Limpiar</button>
+                </div>
+            </div>
+        </div>
+        <div id="s-results"><div class="text-center text-muted py-5"><i class="bi bi-music-note-list" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Ingresa nombre de álbum, canción o Release UUID.</p></div></div>
+    </div>
+
+    {# EVENTOS #}
+    <div class="tab-pane fade" id="panel-events" role="tabpanel">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="alert alert-warning d-flex gap-2 align-items-start py-2 mb-3 small">
+                    <i class="bi bi-exclamation-triangle-fill flex-shrink-0 mt-1"></i>
+                    <span>MusicBrainz tiene datos limitados de eventos. Si no hay datos, se mostrará una plantilla para rellenar manualmente.</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre del artista</label>
+                        <input type="text" id="ev-artist-name" class="form-control" placeholder="ej. Radiohead">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">O UUID del artista</label>
+                        <input type="text" id="ev-mbartist" class="form-control" placeholder="ej. a74b1b7f-...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Nombre del evento <span class="text-muted">(opcional)</span></label>
+                        <input type="text" id="ev-event-name" class="form-control" placeholder="ej. OK Computer Live">
+                    </div>
+                </div>
+                <div class="mt-3 d-flex gap-2">
+                    <button class="btn btn-primary" onclick="searchEvents()"><i class="bi bi-search me-1"></i>Buscar</button>
+                    <button class="btn btn-outline-secondary" onclick="clearResults('ev-results', 'event')"><i class="bi bi-x-lg me-1"></i>Limpiar</button>
+                    <button class="btn btn-outline-primary" onclick="addEmptyEvent()"><i class="bi bi-plus-lg me-1"></i>Añadir manualmente</button>
+                </div>
+            </div>
+        </div>
+        <div id="ev-results"><div class="text-center text-muted py-5"><i class="bi bi-calendar-event" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Busca por artista para ver sus eventos.</p></div></div>
+    </div>
+
+</div>
+
+<div id="import-toast" class="toast align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-3" role="alert" style="z-index:1100">
+    <div class="d-flex">
+        <div class="toast-body fw-semibold" id="import-toast-msg"></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const EMPTY_STATES = {
+    artist: `<div class="text-center text-muted py-5"><i class="bi bi-person-circle" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Ingresa un nombre o UUID para buscar.</p></div>`,
+    album:  `<div class="text-center text-muted py-5"><i class="bi bi-disc" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Ingresa un nombre de artista o UUID para ver sus álbumes.</p></div>`,
+    song:   `<div class="text-center text-muted py-5"><i class="bi bi-music-note-list" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Ingresa nombre de álbum, canción o Release UUID.</p></div>`,
+    event:  `<div class="text-center text-muted py-5"><i class="bi bi-calendar-event" style="font-size:3rem;opacity:.35"></i><p class="mt-3 mb-0">Busca por artista para ver sus eventos.</p></div>`,
+};
+
+function val(id) { return document.getElementById(id).value.trim(); }
+function clearResults(id, type) { document.getElementById(id).innerHTML = EMPTY_STATES[type] || ""; }
+
+function showToast(msg, type = "success") {
+    const toast = document.getElementById("import-toast");
+    toast.className = `toast align-items-center text-bg-${type} border-0 position-fixed bottom-0 end-0 m-3`;
+    document.getElementById("import-toast-msg").textContent = msg;
+    bootstrap.Toast.getOrCreateInstance(toast).show();
+}
+
+function setLoading(id) {
+    document.getElementById(id).innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary mb-3" role="status"></div><p class="text-muted">Buscando en MusicBrainz…</p></div>`;
+}
+
+function showError(id, msg) {
+    document.getElementById(id).innerHTML = `<div class="alert alert-danger d-flex gap-2"><i class="bi bi-exclamation-triangle-fill"></i><div><strong>Error</strong><br><span class="small">${msg}</span></div></div>`;
+}
+
+async function apiFetch(path) {
+    const r = await fetch(path);
+    let d;
+    try { d = await r.json(); } catch { throw new Error(`Error del servidor (HTTP ${r.status})`); }
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    return d;
+}
+
+async function apiPost(path, body) {
+    const r = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+    let d;
+    try { d = await r.json(); } catch { throw new Error(`Error del servidor (HTTP ${r.status})`); }
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    return d;
+}
+
+function field(label, key, value, opts = {}) {
+    const id = `f-${key}-${Math.random().toString(36).slice(2, 6)}`;
+    const escaped = (value ?? "").toString().replace(/"/g, "&quot;");
+    if (opts.textarea) return `<div class="mb-2"><label class="form-label small text-muted mb-1">${label}</label><textarea class="form-control form-control-sm" id="${id}" data-key="${key}" rows="3">${escaped}</textarea></div>`;
+    return `<div class="mb-2"><label class="form-label small text-muted mb-1">${label}</label><input class="form-control form-control-sm" id="${id}" data-key="${key}" value="${escaped}"></div>`;
+}
+
+function readFields(container) {
+    const obj = {};
+    container.querySelectorAll("[data-key]").forEach(el => { obj[el.dataset.key] = el.value.trim() || null; });
+    return obj;
+}
+
+// ── ARTISTAS ──────────────────────────────────────────────────────────────
+
+async function searchArtist() {
+    const name = val("a-name"), mbid = val("a-mbid");
+    if (!name && !mbid) return alert("Ingresa un nombre o UUID");
+    setLoading("a-results");
+    try {
+        const d = await apiFetch(`/admin/api/musicbrainz/search/artist?name=${encodeURIComponent(name)}&mb_id=${encodeURIComponent(mbid)}`);
+        document.getElementById("a-results").innerHTML = "";
+        renderArtist(d);
+    } catch (e) { showError("a-results", e.message); }
+}
+
+function renderArtist(data) {
+    const uid = "a-" + Math.random().toString(36).slice(2, 6);
+    const typeTag = data._mb_type === "Group" ? `<span class="badge bg-info text-dark">Grupo</span>` : `<span class="badge bg-secondary">Artista</span>`;
+    const html = `
+    <div class="card border-0 shadow-sm mb-3" id="${uid}">
+        <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-start">
+            <div>
+                <div class="fw-bold fs-5">${data.artist_name}</div>
+                <div class="d-flex gap-2 mt-1">${typeTag}<span class="text-muted small">${data.country || "País desconocido"} · ${data.birth_date || "—"}</span></div>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge rounded-pill bg-warning text-dark px-3" id="${uid}-badge">PENDIENTE</span>
+                <button class="btn btn-success btn-sm" onclick="saveArtist('${uid}')"><i class="bi bi-cloud-arrow-up me-1"></i>Guardar</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="col-md-6">${field("Nombre artístico", "artist_name", data.artist_name)}</div>
+                <div class="col-md-6">${field("Nombre real", "real_name", data.real_name)}</div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-4">${field("Fecha de nacimiento", "birth_date", data.birth_date)}</div>
+                <div class="col-md-4">${field("Debut", "debut", data.debut)}</div>
+                <div class="col-md-4">${field("País", "country", data.country)}</div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-6">${field("URL de imagen", "image", data.image)}</div>
+                <div class="col-md-6">${field("Redes sociales (URL)", "social_media", data.social_media)}</div>
+            </div>
+            ${field("Descripción", "description", data.description, { textarea: true })}
+            <input type="hidden" data-key="mb_id" value="${data.mb_id || ""}">
+        </div>
+    </div>`;
+    document.getElementById("a-results").insertAdjacentHTML("beforeend", html);
+}
+
+async function saveArtist(uid) {
+    const card = document.getElementById(uid);
+    const badge = document.getElementById(uid + "-badge");
+    const data = readFields(card);
+    badge.textContent = "Guardando…"; badge.className = "badge rounded-pill bg-secondary px-3";
+    try {
+        const r = await apiPost("/admin/api/musicbrainz/artists", data);
+        badge.textContent = `GUARDADO #${r.artist_id}`; badge.className = "badge rounded-pill bg-success px-3";
+        showToast(`Artista guardado: ${r.artist_name} (ID ${r.artist_id})`);
+    } catch (e) {
+        badge.textContent = "ERROR"; badge.className = "badge rounded-pill bg-danger px-3";
+        showToast(e.message, "danger");
+    }
+}
+
+// ── ÁLBUMES ───────────────────────────────────────────────────────────────
+
+async function searchAlbums() {
+    const artistName = val("al-artist-name"), mbArtist = val("al-mbartist");
+    const albumName = val("al-album-name"), mbRelease = val("al-mbrelease");
+    if (!artistName && !mbArtist && !mbRelease) return alert("Ingresa nombre de artista, UUID o UUID de release");
+    setLoading("al-results");
+    try {
+        const params = new URLSearchParams({ artist_name: artistName, mb_artist: mbArtist, album_name: albumName, mb_release: mbRelease });
+        const d = await apiFetch(`/admin/api/musicbrainz/search/albums?${params}`);
+        const list = Array.isArray(d) ? d : [d];
+        const area = document.getElementById("al-results");
+        area.innerHTML = `<p class="text-muted small mb-3"><i class="bi bi-check-circle-fill text-success me-1"></i>${list.length} álbum(s) encontrado(s)</p>`;
+        list.forEach(item => renderAlbum(item));
+    } catch (e) { showError("al-results", e.message); }
+}
+
+function renderAlbum(data) {
+    const uid = "al-" + Math.random().toString(36).slice(2, 6);
+    const coverEl = data.cover_album
+        ? `<img src="${data.cover_album}" class="rounded" style="width:72px;height:72px;object-fit:cover;flex-shrink:0" onerror="this.style.display='none'">`
+        : `<div class="rounded bg-secondary bg-opacity-25 d-flex align-items-center justify-content-center" style="width:72px;height:72px;flex-shrink:0"><i class="bi bi-disc fs-2 text-secondary"></i></div>`;
+    const html = `
+    <div class="card border-0 shadow-sm mb-3" id="${uid}">
+        <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-start">
+            <div class="d-flex gap-3">${coverEl}
+                <div>
+                    <div class="fw-bold fs-5">${data.album_title}</div>
+                    <div class="text-muted small">${data.release_date || "?"} · ${data.total_track} pistas</div>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge rounded-pill bg-warning text-dark px-3" id="${uid}-badge">PENDIENTE</span>
+                <button class="btn btn-success btn-sm" onclick="saveAlbum('${uid}')"><i class="bi bi-cloud-arrow-up me-1"></i>Guardar</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info d-flex gap-2 py-2 small mb-3"><i class="bi bi-info-circle-fill"></i><span>Guarda el artista primero. El <strong>artist_id</strong> se resuelve por UUID automáticamente.</span></div>
+            <div class="row g-2">
+                <div class="col-md-4">${field("Título", "album_title", data.album_title)}</div>
+                <div class="col-md-4">${field("Fecha lanzamiento", "release_date", data.release_date)}</div>
+                <div class="col-md-4">${field("Pistas", "total_track", data.total_track)}</div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-6">${field("URL portada", "cover_album", data.cover_album)}</div>
+                <div class="col-md-6">${field("URL Spotify", "spotify", data.spotify)}</div>
+            </div>
+            <input type="hidden" data-key="mb_album_id" value="${data.mb_album_id || ""}">
+            <input type="hidden" data-key="_mb_artist_id" value="${data._mb_artist_id || ""}">
+            <input type="hidden" data-key="artist_id" value="${data.artist_id || ""}">
+        </div>
+    </div>`;
+    document.getElementById("al-results").insertAdjacentHTML("beforeend", html);
+}
+
+async function saveAlbum(uid) {
+    const card = document.getElementById(uid);
+    const badge = document.getElementById(uid + "-badge");
+    const data = readFields(card);
+    data.total_track = parseInt(data.total_track) || 0;
+    badge.textContent = "Guardando…"; badge.className = "badge rounded-pill bg-secondary px-3";
+    try {
+        const r = await apiPost("/admin/api/musicbrainz/albums", data);
+        badge.textContent = `GUARDADO #${r.album_id}`; badge.className = "badge rounded-pill bg-success px-3";
+        showToast(`Álbum guardado: ${r.album_title} (ID ${r.album_id})`);
+    } catch (e) {
+        badge.textContent = "ERROR"; badge.className = "badge rounded-pill bg-danger px-3";
+        showToast(e.message, "danger");
+    }
+}
+
+// ── CANCIONES ─────────────────────────────────────────────────────────────
+
+async function searchSongs() {
+    const artistName = val("s-artist-name"), mbArtist = val("s-mbartist");
+    const albumName = val("s-album-name"), mbRelease = val("s-mbrelease");
+    const songName = val("s-song-name");
+    if (!mbRelease && !albumName && !songName) return alert("Ingresa nombre de álbum, canción o Release UUID");
+    setLoading("s-results");
+    try {
+        const params = new URLSearchParams({ artist_name: artistName, mb_artist: mbArtist, album_name: albumName, mb_release: mbRelease, song_name: songName });
+        const d = await apiFetch(`/admin/api/musicbrainz/search/songs?${params}`);
+        const list = Array.isArray(d) ? d : [d];
+        const area = document.getElementById("s-results");
+        area.innerHTML = `<div class="d-flex align-items-center justify-content-between mb-3">
+            <p class="text-muted small mb-0"><i class="bi bi-check-circle-fill text-success me-1"></i>${list.length} pista(s)</p>
+            ${list.length > 1 ? `<button class="btn btn-success btn-sm" onclick="saveAllSongs()"><i class="bi bi-cloud-arrow-up me-1"></i>Guardar todas (${list.length})</button>` : ""}
+        </div>`;
+        list.forEach(item => renderSong(item));
+    } catch (e) { showError("s-results", e.message); }
+}
+
+function renderSong(data) {
+    const uid = "s-" + Math.random().toString(36).slice(2, 6);
+    const html = `
+    <div class="card border-0 shadow-sm mb-2" id="${uid}" data-songcard="1">
+        <div class="card-body py-2">
+            <div class="d-flex align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-3 min-w-0">
+                    <i class="bi bi-music-note text-primary fs-5 flex-shrink-0"></i>
+                    <div class="min-w-0">
+                        <div class="fw-semibold text-truncate">${data.song_title}</div>
+                        <div class="text-muted small">${data.duration} · ${data._album_title || ""}</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 flex-shrink-0">
+                    <span class="badge rounded-pill bg-warning text-dark" id="${uid}-badge">PENDIENTE</span>
+                    <button class="btn btn-success btn-sm" onclick="saveSong('${uid}')"><i class="bi bi-cloud-arrow-up me-1"></i>Guardar</button>
+                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#${uid}-detail"><i class="bi bi-pencil-square"></i></button>
+                </div>
+            </div>
+            <div class="collapse mt-3 pt-2 border-top" id="${uid}-detail">
+                <div class="row g-2">
+                    <div class="col-md-4">${field("Título", "song_title", data.song_title)}</div>
+                    <div class="col-md-4">${field("Duración (HH:MM:SS)", "duration", data.duration)}</div>
+                    <div class="col-md-4">${field("URL de vídeo", "video_url", data.video_url)}</div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-6">${field("URL portada", "cover_song", data.cover_song)}</div>
+                    <div class="col-md-6">${field("Album ID", "album_id", data.album_id || "")}</div>
+                </div>
+            </div>
+            <input type="hidden" data-key="mb_song_id" value="${data.mb_song_id || ""}">
+            <input type="hidden" data-key="_mb_release_id" value="${data._mb_release_id || ""}">
+        </div>
+    </div>`;
+    document.getElementById("s-results").insertAdjacentHTML("beforeend", html);
+}
+
+async function saveSong(uid) {
+    const card = document.getElementById(uid);
+    const badge = document.getElementById(uid + "-badge");
+    const data = readFields(card);
+    badge.textContent = "Guardando…"; badge.className = "badge rounded-pill bg-secondary";
+    try {
+        const r = await apiPost("/admin/api/musicbrainz/songs", data);
+        badge.textContent = `GUARDADO #${r.song_id}`; badge.className = "badge rounded-pill bg-success";
+        showToast(`Canción guardada: ${r.song_title} (ID ${r.song_id})`);
+    } catch (e) {
+        badge.textContent = "ERROR"; badge.className = "badge rounded-pill bg-danger";
+        showToast(e.message, "danger");
+    }
+}
+
+async function saveAllSongs() {
+    const cards = document.querySelectorAll("[data-songcard='1']");
+    let ok = 0, err = 0;
+    for (const card of cards) {
+        const badge = card.querySelector(".badge");
+        if (badge?.textContent.startsWith("GUARDADO")) continue;
+        const data = readFields(card);
+        badge.textContent = "Guardando…"; badge.className = "badge rounded-pill bg-secondary";
+        try {
+            const r = await apiPost("/admin/api/musicbrainz/songs", data);
+            badge.textContent = `GUARDADO #${r.song_id}`; badge.className = "badge rounded-pill bg-success"; ok++;
+        } catch (e) {
+            badge.textContent = "ERROR"; badge.className = "badge rounded-pill bg-danger"; err++;
+        }
+        await new Promise(res => setTimeout(res, 250));
+    }
+    showToast(`${ok} guardada(s)${err ? `, ${err} error(es)` : ""}`, err ? "danger" : "success");
+}
+
+// ── EVENTOS ───────────────────────────────────────────────────────────────
+
+const EVENT_TYPES = ["concert", "tour", "festival", "movie", "tv_series"];
+
+async function searchEvents() {
+    const artistName = val("ev-artist-name"), mbArtist = val("ev-mbartist"), eventName = val("ev-event-name");
+    if (!artistName && !mbArtist && !eventName) return alert("Ingresa el nombre del artista o su UUID");
+    setLoading("ev-results");
+    try {
+        const params = new URLSearchParams({ artist_name: artistName, mb_artist: mbArtist, event_name: eventName });
+        const d = await apiFetch(`/admin/api/musicbrainz/search/events?${params}`);
+        const list = Array.isArray(d) ? d : [d];
+        const area = document.getElementById("ev-results");
+        area.innerHTML = `<p class="text-muted small mb-3"><i class="bi bi-check-circle-fill text-success me-1"></i>${list.length} evento(s)</p>`;
+        list.forEach(item => renderEvent(item));
+    } catch (e) { showError("ev-results", e.message); }
+}
+
+function addEmptyEvent() {
+    const area = document.getElementById("ev-results");
+    if (area.querySelector(".text-center")) area.innerHTML = "";
+    renderEvent({ event_name: "", event_type: "concert", event_date: null, location: null, poster: "", _mb_artist_id: null, _artist_name: val("ev-artist-name") });
+}
+
+function renderEvent(data) {
+    const uid = "ev-" + Math.random().toString(36).slice(2, 6);
+    const isTemplate = !!data._note;
+    const typeOptions = EVENT_TYPES.map(t => `<option value="${t}"${t === (data.event_type || "concert") ? " selected" : ""}>${t}</option>`).join("");
+    const html = `
+    <div class="card border-0 shadow-sm mb-3" id="${uid}">
+        <div class="card-header bg-transparent py-3 d-flex justify-content-between align-items-start">
+            <div>
+                <div class="fw-bold fs-5">${data.event_name || "⚠️ Evento sin nombre"}</div>
+                <div class="d-flex gap-2 mt-1">
+                    <span class="badge bg-secondary">${data.event_type || "concert"}</span>
+                    <span class="text-muted small">${data.event_date || "fecha?"} · ${data.location || "lugar?"}</span>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <span class="badge rounded-pill bg-warning text-dark px-3" id="${uid}-badge">${isTemplate ? "PLANTILLA" : "PENDIENTE"}</span>
+                <button class="btn btn-success btn-sm" onclick="saveEvent('${uid}')"><i class="bi bi-cloud-arrow-up me-1"></i>Guardar</button>
+            </div>
+        </div>
+        <div class="card-body">
+            ${isTemplate ? `<div class="alert alert-info py-2 small mb-3">${data._note}</div>` : ""}
+            <div class="alert alert-info d-flex gap-2 py-2 small mb-3"><i class="bi bi-info-circle-fill"></i><span>Guarda el artista primero. <strong>artist_id</strong> se resuelve por UUID automáticamente.</span></div>
+            <div class="row g-2">
+                <div class="col-md-6">${field("Nombre del evento *", "event_name", data.event_name)}</div>
+                <div class="col-md-3">
+                    <div class="mb-2"><label class="form-label small text-muted mb-1">Tipo *</label>
+                    <select class="form-select form-select-sm" data-key="event_type">${typeOptions}</select></div>
+                </div>
+                <div class="col-md-3">${field("Fecha (YYYY-MM-DD) *", "event_date", data.event_date)}</div>
+            </div>
+            <div class="row g-2">
+                <div class="col-md-6">${field("Ubicación", "location", data.location)}</div>
+                <div class="col-md-6">${field("URL del póster *", "poster", data.poster)}</div>
+            </div>
+            <input type="hidden" data-key="artist_id" value="${data.artist_id || ""}">
+            <input type="hidden" data-key="_mb_artist_id" value="${data._mb_artist_id || ""}">
+        </div>
+    </div>`;
+    document.getElementById("ev-results").insertAdjacentHTML("beforeend", html);
+}
+
+async function saveEvent(uid) {
+    const card = document.getElementById(uid);
+    const badge = document.getElementById(uid + "-badge");
+    const data = readFields(card);
+    badge.textContent = "Guardando…"; badge.className = "badge rounded-pill bg-secondary px-3";
+    try {
+        const r = await apiPost("/admin/api/musicbrainz/events", data);
+        badge.textContent = `GUARDADO #${r.event_id}`; badge.className = "badge rounded-pill bg-success px-3";
+        showToast(`Evento guardado: ${r.event_name} (ID ${r.event_id})`);
+    } catch (e) {
+        badge.textContent = "ERROR"; badge.className = "badge rounded-pill bg-danger px-3";
+        showToast(e.message, "danger");
+    }
+}
+</script>
+{% endblock %}
