@@ -17,6 +17,7 @@ def login():
     if user and user.password == password: # Nota: En producción usar hashing (werkzeug.security)
         session['user_id'] = user.user_id
         session['username'] = user.username
+        session['is_admin'] = user.is_admin
         return jsonify({"message": "Login exitoso", "user": user.to_dict()}), 200
     
     return jsonify({"error": "Credenciales inválidas"}), 401

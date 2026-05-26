@@ -9,14 +9,14 @@
         <div class="d-flex justify-content-between align-items-start">
             <h1>{{ album.album_title }}</h1>
             <div class="d-flex gap-2">
-                <a href="{{ url_for('admin.edit_album', album_id=album.album_id) }}" class="btn btn-warning btn-sm">Editar</a>
-                <form action="{{ url_for('admin.delete_album', album_id=album.album_id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar álbum?')">
+                <a href="{{ url_for('main.edit_album', album_id=album.album_id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form action="{{ url_for('main.delete_album', album_id=album.album_id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar álbum?')">
                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                 </form>
             </div>
         </div>
         <hr>
-        <p><strong>Artista:</strong> <a href="{{ url_for('admin.view_artist', artist_id=album.artist.artist_id) }}">{{ album.artist.artist_name }}</a></p>
+        <p><strong>Artista:</strong> <a href="{{ url_for('main.view_artist', artist_id=album.artist.artist_id) }}">{{ album.artist.artist_name }}</a></p>
         <p><strong>Lanzamiento:</strong> {{ album.release_date }}</p>
         <p><strong>Pistas:</strong> {{ album.total_track }}</p>
         {% if album.spotify and album.spotify.startswith('http') %}
@@ -35,7 +35,7 @@
             <td>{{ loop.index }}</td>
             <td>{{ song.song_title }}</td>
             <td>{{ song.duration }}</td>
-            <td><a href="{{ url_for('admin.view_song', song_id=song.song_id) }}" class="btn btn-sm btn-info text-white">Ver</a></td>
+            <td><a href="{{ url_for('main.view_song', song_id=song.song_id) }}" class="btn btn-sm btn-info text-white">Ver</a></td>
         </tr>
         {% endfor %}
     </tbody>
