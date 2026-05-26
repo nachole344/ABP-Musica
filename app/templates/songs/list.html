@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Canciones{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Canciones</h1>
+    <a href="{{ url_for('main.new_song') }}" class="btn btn-info text-white">+ Nueva canción</a>
+</div>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Título</th><th>Álbum</th><th>Artista</th><th>Duración</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for song in songs %}
+        <tr>
+            <td>{{ song.song_title }}</td>
+            <td><a href="{{ url_for('main.view_album', album_id=song.album.album_id) }}">{{ song.album.album_title }}</a></td>
+            <td><a href="{{ url_for('main.view_artist', artist_id=song.album.artist.artist_id) }}">{{ song.album.artist.artist_name }}</a></td>
+            <td>{{ song.duration }}</td>
+            <td><a href="{{ url_for('main.view_song', song_id=song.song_id) }}" class="btn btn-sm btn-info text-white">Ver</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-muted text-center">Sin canciones.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
