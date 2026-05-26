@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Artist App{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center py-5">
+    <h1 class="display-4">Artist App</h1>
+    <p class="lead">Catalog of artists, albums, and songs</p>
+    <hr class="my-4">
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{{ url_for('main.list_artists') }}" class="btn btn-primary btn-lg">Artists</a>
+        <a href="{{ url_for('main.list_albums') }}" class="btn btn-success btn-lg">Albums</a>
+        <a href="{{ url_for('main.list_songs') }}" class="btn btn-info btn-lg">Songs</a>
+    </div>
+</div>
+
+<h2 class="mb-3">Artists</h2>
+<div class="row">
+    {% for artist in artists %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <img src="{{ artist.image }}" class="card-img-top" alt="{{ artist.artist_name }}" style="height:200px;object-fit:cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ artist.artist_name }}</h5>
+                    <p class="card-text">{{ artist.country }}</p>
+                    <a href="{{ url_for('main.view_artist', artist_id=artist.artist_id) }}" class="btn btn-sm btn-primary">View</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<h2 class="mb-3 mt-4">Recent Albums</h2>
+<div class="row">
+    {% for album in albums %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <img src="{{ album.cover_album }}" class="card-img-top" alt="{{ album.album_title }}" style="height:200px;object-fit:cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ album.album_title }}</h5>
+                    <p class="card-text">{{ album.artist.artist_name }}</p>
+                    <a href="{{ url_for('main.view_album', album_id=album.album_id) }}" class="btn btn-sm btn-success">View</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
