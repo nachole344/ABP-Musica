@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SoundScape | Experience</title>
+    <title>MuzeHub | Experience</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Tailwind CSS -->
@@ -369,6 +369,717 @@
                 opacity: 1;
             }
         }
+        .eco-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #10b981;
+    margin-bottom: 0.85rem;
+    display: block;
+}
+ 
+/* — Intro card — */
+.eco-intro-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    max-width: 860px;
+}
+.eco-intro-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #10b981 0%, transparent 65%);
+}
+ 
+/* — Métricas — */
+.eco-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.eco-metric-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1.75rem;
+    position: relative;
+    transition: border-color 0.25s, background 0.25s;
+}
+.eco-metric-card:hover {
+    border-color: rgba(16, 185, 129, 0.35);
+    background: rgba(255, 255, 255, 0.06);
+}
+.eco-metric-icon {
+    width: 34px;
+    height: 34px;
+    background: rgba(16, 185, 129, 0.12);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    color: #10b981;
+}
+.eco-metric-num {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #10b981;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.2rem;
+}
+.eco-metric-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 0.4rem;
+}
+.eco-metric-desc {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.28);
+    line-height: 1.5;
+    font-weight: 300;
+}
+ 
+/* — Pilares — */
+.eco-pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.eco-pillar-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 2rem;
+    transition: border-color 0.25s;
+}
+.eco-pillar-card:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+.eco-pillar-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #10b981;
+    opacity: 0.65;
+    margin-bottom: 0.85rem;
+}
+.eco-pillar-ico {
+    width: 40px;
+    height: 40px;
+    background: rgba(16, 185, 129, 0.12);
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #10b981;
+    margin-bottom: 0.9rem;
+}
+.eco-pillar-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.45rem;
+}
+.eco-pillar-card p {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.38);
+    line-height: 1.65;
+    font-weight: 300;
+}
+.eco-tag {
+    display: inline-block;
+    margin-top: 1.1rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 0.28rem 0.7rem;
+    border-radius: 100px;
+}
+ 
+/* — Productos — */
+.eco-products-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.eco-product-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: border-color 0.25s, background 0.25s;
+}
+.eco-product-card:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+}
+.eco-product-emoji {
+    font-size: 1.8rem;
+    margin-bottom: 0.65rem;
+    display: block;
+}
+.eco-product-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 0.35rem;
+}
+.eco-product-eco {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.32);
+    line-height: 1.4;
+    font-weight: 300;
+}
+ 
+/* — Timeline — */
+.eco-timeline-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2.5rem;
+    max-width: 860px;
+}
+.eco-timeline {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(16, 185, 129, 0.2);
+    padding-left: 1.75rem;
+}
+.eco-tl-item {
+    position: relative;
+    padding-bottom: 1.75rem;
+}
+.eco-tl-item:last-child {
+    padding-bottom: 0;
+}
+.eco-tl-item::before {
+    content: '';
+    position: absolute;
+    left: -2.18rem;
+    top: 0.3rem;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #050505;
+    border: 2px solid #10b981;
+}
+.eco-tl-item.done::before {
+    background: #10b981;
+}
+.eco-tl-year {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #10b981;
+    opacity: 0.75;
+    margin-bottom: 0.2rem;
+}
+.eco-tl-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.18rem;
+}
+.eco-tl-desc {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.32);
+    line-height: 1.5;
+    font-weight: 300;
+}
+ 
+/* — Cita — */
+.eco-quote-card {
+    background: rgba(16, 185, 129, 0.07);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    border-radius: 20px;
+    padding: 2.25rem 2.5rem;
+    margin-bottom: 2.5rem;
+    max-width: 860px;
+    position: relative;
+}
+.eco-quote-card::before {
+    content: '"';
+    position: absolute;
+    top: 0.75rem;
+    left: 2rem;
+    font-size: 4rem;
+    color: #10b981;
+    opacity: 0.18;
+    font-weight: 900;
+    line-height: 1;
+}
+.eco-quote-card blockquote {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+}
+.eco-quote-card cite {
+    font-size: 0.7rem;
+    color: #10b981;
+    font-style: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.65;
+}
+ 
+/* — CTA Informe — */
+.eco-cta-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    max-width: 860px;
+    position: relative;
+    overflow: hidden;
+}
+.eco-cta-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #10b981 0%, transparent 60%);
+}
+.eco-cta-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.3rem;
+}
+.eco-cta-card p {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.38);
+    font-weight: 300;
+}
+.eco-btn {
+    flex-shrink: 0;
+    background: #10b981;
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.6rem;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+.eco-btn:hover {
+    opacity: 0.82;
+    transform: translateY(-1px);
+}
+ 
+/* — Pie de sección — */
+.eco-footer-note {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.18);
+    letter-spacing: 0.05em;
+    padding-bottom: 1rem;
+}
+ 
+/* — Responsive — */
+@media (max-width: 992px) {
+    .eco-metrics-grid  { grid-template-columns: 1fr 1fr; }
+    .eco-pillars-grid  { grid-template-columns: 1fr; }
+    .eco-products-row  { grid-template-columns: repeat(3, 1fr); }
+    .eco-cta-card      { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 576px) {
+    .eco-metrics-grid  { grid-template-columns: 1fr; }
+    .eco-products-row  { grid-template-columns: repeat(2, 1fr); }
+    .eco-intro-card,
+    .eco-timeline-card,
+    .eco-quote-card,
+    .eco-cta-card      { padding: 1.5rem; }
+}.eco-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #10b981;
+    margin-bottom: 0.85rem;
+    display: block;
+}
+ 
+/* — Intro card — */
+.eco-intro-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2.5rem;
+    max-width: 860px;
+}
+.eco-intro-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #10b981 0%, transparent 65%);
+}
+ 
+/* — Métricas — */
+.eco-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.eco-metric-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1.75rem;
+    position: relative;
+    transition: border-color 0.25s, background 0.25s;
+}
+.eco-metric-card:hover {
+    border-color: rgba(16, 185, 129, 0.35);
+    background: rgba(255, 255, 255, 0.06);
+}
+.eco-metric-icon {
+    width: 34px;
+    height: 34px;
+    background: rgba(16, 185, 129, 0.12);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 1.4rem;
+    right: 1.4rem;
+    color: #10b981;
+}
+.eco-metric-num {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: #10b981;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.2rem;
+}
+.eco-metric-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    margin-bottom: 0.4rem;
+}
+.eco-metric-desc {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.28);
+    line-height: 1.5;
+    font-weight: 300;
+}
+ 
+/* — Pilares — */
+.eco-pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.eco-pillar-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 2rem;
+    transition: border-color 0.25s;
+}
+.eco-pillar-card:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+.eco-pillar-num {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: #10b981;
+    opacity: 0.65;
+    margin-bottom: 0.85rem;
+}
+.eco-pillar-ico {
+    width: 40px;
+    height: 40px;
+    background: rgba(16, 185, 129, 0.12);
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #10b981;
+    margin-bottom: 0.9rem;
+}
+.eco-pillar-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.45rem;
+}
+.eco-pillar-card p {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.38);
+    line-height: 1.65;
+    font-weight: 300;
+}
+.eco-tag {
+    display: inline-block;
+    margin-top: 1.1rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 0.28rem 0.7rem;
+    border-radius: 100px;
+}
+ 
+/* — Productos — */
+.eco-products-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+}
+.eco-product-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    transition: border-color 0.25s, background 0.25s;
+}
+.eco-product-card:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+    background: rgba(255, 255, 255, 0.06);
+}
+.eco-product-emoji {
+    font-size: 1.8rem;
+    margin-bottom: 0.65rem;
+    display: block;
+}
+.eco-product-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 0.35rem;
+}
+.eco-product-eco {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.32);
+    line-height: 1.4;
+    font-weight: 300;
+}
+ 
+/* — Timeline — */
+.eco-timeline-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2.5rem;
+    max-width: 860px;
+}
+.eco-timeline {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(16, 185, 129, 0.2);
+    padding-left: 1.75rem;
+}
+.eco-tl-item {
+    position: relative;
+    padding-bottom: 1.75rem;
+}
+.eco-tl-item:last-child {
+    padding-bottom: 0;
+}
+.eco-tl-item::before {
+    content: '';
+    position: absolute;
+    left: -2.18rem;
+    top: 0.3rem;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #050505;
+    border: 2px solid #10b981;
+}
+.eco-tl-item.done::before {
+    background: #10b981;
+}
+.eco-tl-year {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #10b981;
+    opacity: 0.75;
+    margin-bottom: 0.2rem;
+}
+.eco-tl-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.18rem;
+}
+.eco-tl-desc {
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.32);
+    line-height: 1.5;
+    font-weight: 300;
+}
+ 
+/* — Cita — */
+.eco-quote-card {
+    background: rgba(16, 185, 129, 0.07);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    border-radius: 20px;
+    padding: 2.25rem 2.5rem;
+    margin-bottom: 2.5rem;
+    max-width: 860px;
+    position: relative;
+}
+.eco-quote-card::before {
+    content: '"';
+    position: absolute;
+    top: 0.75rem;
+    left: 2rem;
+    font-size: 4rem;
+    color: #10b981;
+    opacity: 0.18;
+    font-weight: 900;
+    line-height: 1;
+}
+.eco-quote-card blockquote {
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: #fff;
+    line-height: 1.65;
+    margin-bottom: 0.75rem;
+}
+.eco-quote-card cite {
+    font-size: 0.7rem;
+    color: #10b981;
+    font-style: normal;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    opacity: 0.65;
+}
+ 
+/* — CTA Informe — */
+.eco-cta-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    max-width: 860px;
+    position: relative;
+    overflow: hidden;
+}
+.eco-cta-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, #10b981 0%, transparent 60%);
+}
+.eco-cta-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.3rem;
+}
+.eco-cta-card p {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.38);
+    font-weight: 300;
+}
+.eco-btn {
+    flex-shrink: 0;
+    background: #10b981;
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.6rem;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    white-space: nowrap;
+}
+.eco-btn:hover {
+    opacity: 0.82;
+    transform: translateY(-1px);
+}
+ 
+/* — Pie de sección — */
+.eco-footer-note {
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.18);
+    letter-spacing: 0.05em;
+    padding-bottom: 1rem;
+}
+ 
+/* — Responsive — */
+@media (max-width: 992px) {
+    .eco-metrics-grid  { grid-template-columns: 1fr 1fr; }
+    .eco-pillars-grid  { grid-template-columns: 1fr; }
+    .eco-products-row  { grid-template-columns: repeat(3, 1fr); }
+    .eco-cta-card      { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 576px) {
+    .eco-metrics-grid  { grid-template-columns: 1fr; }
+    .eco-products-row  { grid-template-columns: repeat(2, 1fr); }
+    .eco-intro-card,
+    .eco-timeline-card,
+    .eco-quote-card,
+    .eco-cta-card      { padding: 1.5rem; }
+}
     </style>
 </head>
 
@@ -580,13 +1291,190 @@
             </section>
 
             <!-- SECCIÓN: SOSTENIBILIDAD -->
-            <section id="sustainability-section" class="content-overlay">
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-12 text-emerald-500">ECO <span
-                        class="text-white">MISSION</span></h1>
-                <div class="bg-white/5 p-6 md:p-12 rounded-3xl border border-white/10 max-w-4xl">
-                    <p class="text-xl md:text-2xl text-slate-300 leading-relaxed mb-8">Nuestra plataforma está diseñada
-                        para minimizar el impacto ambiental de la industria musical...</p>
+             <section id="sustainability-section" class="content-overlay">
+ 
+                <!-- TÍTULO -->
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-3">
+                    <span class="text-emerald-500">ECO</span> <span class="text-white">MISSION</span>
+                </h1>
+                <p class="text-slate-400 mb-10 text-sm font-medium tracking-widest uppercase">MuzeHub · Compromiso ambiental 2026</p>
+ 
+                <!-- INTRO CARD -->
+                <div class="eco-intro-card">
+                    <p class="text-lg text-slate-300 leading-relaxed">
+                        Nuestra plataforma está diseñada para <strong class="text-white">minimizar el impacto ambiental de la industria musical</strong>. Desde los vinilos que prensan nuestros artistas hasta la camiseta que llevas a un concierto, cada decisión lleva el sello de nuestra misión ecológica. En <strong class="text-emerald-400">2030</strong> queremos ser una discográfica completamente neutra en carbono.
+                    </p>
                 </div>
+ 
+                <!-- MÉTRICAS -->
+                <span class="eco-section-label">Impacto real · 2025</span>
+                <div class="eco-metrics-grid">
+ 
+                    <div class="eco-metric-card">
+                        <div class="eco-metric-icon">
+                            <i data-lucide="recycle" size="16"></i>
+                        </div>
+                        <div class="eco-metric-num">87%</div>
+                        <div class="eco-metric-label">Materiales reciclados</div>
+                        <div class="eco-metric-desc">Del total de packaging de vinilos y álbumes producidos este año.</div>
+                    </div>
+ 
+                    <div class="eco-metric-card">
+                        <div class="eco-metric-icon">
+                            <i data-lucide="tree-pine" size="16"></i>
+                        </div>
+                        <div class="eco-metric-num">12k</div>
+                        <div class="eco-metric-label">Árboles plantados</div>
+                        <div class="eco-metric-desc">Reforestación activa en España y Latinoamérica con ONGs locales.</div>
+                    </div>
+ 
+                    <div class="eco-metric-card">
+                        <div class="eco-metric-icon">
+                            <i data-lucide="sun" size="16"></i>
+                        </div>
+                        <div class="eco-metric-num">100%</div>
+                        <div class="eco-metric-label">Energía renovable</div>
+                        <div class="eco-metric-desc">Oficinas y almacenes con energía solar y eólica desde 2023.</div>
+                    </div>
+ 
+                    <div class="eco-metric-card">
+                        <div class="eco-metric-icon">
+                            <i data-lucide="truck" size="16"></i>
+                        </div>
+                        <div class="eco-metric-num">−40%</div>
+                        <div class="eco-metric-label">Emisiones de envío</div>
+                        <div class="eco-metric-desc">Reducción con flota eléctrica y rutas optimizadas.</div>
+                    </div>
+ 
+                    <div class="eco-metric-card">
+                        <div class="eco-metric-icon">
+                            <i data-lucide="package-x" size="16"></i>
+                        </div>
+                        <div class="eco-metric-num">0</div>
+                        <div class="eco-metric-label">Plástico virgen</div>
+                        <div class="eco-metric-desc">Eliminado completamente de todos nuestros envíos desde 2022.</div>
+                    </div>
+ 
+                    <div class="eco-metric-card">
+                        <div class="eco-metric-icon">
+                            <i data-lucide="badge-check" size="16"></i>
+                        </div>
+                        <div class="eco-metric-num">GOTS</div>
+                        <div class="eco-metric-label">Ropa certificada</div>
+                        <div class="eco-metric-desc">Toda la línea de ropa lleva certificación orgánica internacional.</div>
+                    </div>
+ 
+                </div>
+ 
+                <!-- PILARES -->
+                <span class="eco-section-label">Nuestros pilares</span>
+                <div class="eco-pillars-grid">
+ 
+                    <div class="eco-pillar-card">
+                        <div class="eco-pillar-num">01 —</div>
+                        <div class="eco-pillar-ico"><i data-lucide="factory" size="18"></i></div>
+                        <h3>Producción consciente</h3>
+                        <p>Trabajamos con prensadoras de vinilos que usan PVC reciclado e imprentas certificadas FSC. Cada decisión empieza con una pregunta: ¿cuál es su impacto?</p>
+                        <span class="eco-tag">Fabricación · Materiales</span>
+                    </div>
+ 
+                    <div class="eco-pillar-card">
+                        <div class="eco-pillar-num">02 —</div>
+                        <div class="eco-pillar-ico"><i data-lucide="shirt" size="18"></i></div>
+                        <h3>Moda que respira</h3>
+                        <p>Ropa y bolsas de algodón orgánico certificado, tintas a base de agua y etiquetas en papel reciclado. Colección limpia de principio a fin.</p>
+                        <span class="eco-tag">Ropa · Bolsas · Pines</span>
+                    </div>
+ 
+                    <div class="eco-pillar-card">
+                        <div class="eco-pillar-num">03 —</div>
+                        <div class="eco-pillar-ico"><i data-lucide="truck" size="18"></i></div>
+                        <h3>Envíos sin huella</h3>
+                        <p>Logística con flota eléctrica en última milla. Agrupamos pedidos para reducir viajes y compensamos el 100% de las emisiones que aún no eliminamos.</p>
+                        <span class="eco-tag">Logística · Packaging</span>
+                    </div>
+ 
+                    <div class="eco-pillar-card">
+                        <div class="eco-pillar-num">04 —</div>
+                        <div class="eco-pillar-ico"><i data-lucide="mic-2" size="18"></i></div>
+                        <h3>Artistas como activistas</h3>
+                        <p>Cada artista del catálogo firma nuestro compromiso medioambiental. Parte de los royalties de streams va a proyectos de conservación elegidos por ellos.</p>
+                        <span class="eco-tag">Comunidad · Artistas</span>
+                    </div>
+ 
+                </div>
+ 
+                <!-- PRODUCTOS -->
+                <span class="eco-section-label">Cada producto, un compromiso</span>
+                <div class="eco-products-row">
+                    <div class="eco-product-card">
+                        <span class="eco-product-emoji">💿</span>
+                        <div class="eco-product-name">Álbumes</div>
+                        <div class="eco-product-eco">Packaging 100% reciclado. Sin plástico virgen.</div>
+                    </div>
+                    <div class="eco-product-card">
+                        <span class="eco-product-emoji">🎵</span>
+                        <div class="eco-product-name">Vinilos</div>
+                        <div class="eco-product-eco">PVC reciclado. Fundas sin polipropileno.</div>
+                    </div>
+                    <div class="eco-product-card">
+                        <span class="eco-product-emoji">👕</span>
+                        <div class="eco-product-name">Ropa</div>
+                        <div class="eco-product-eco">Algodón GOTS. Tintas a base de agua.</div>
+                    </div>
+                    <div class="eco-product-card">
+                        <span class="eco-product-emoji">🛍️</span>
+                        <div class="eco-product-name">Bolsas</div>
+                        <div class="eco-product-eco">Tela orgánica sin blanquear. Muy duradera.</div>
+                    </div>
+                    <div class="eco-product-card">
+                        <span class="eco-product-emoji">📌</span>
+                        <div class="eco-product-name">Pines</div>
+                        <div class="eco-product-eco">Metal reciclado. Packaging compostable.</div>
+                    </div>
+                </div>
+ 
+                <!-- TIMELINE -->
+                <div class="eco-timeline-card">
+                    <span class="eco-section-label">Hoja de ruta · 2022 – 2030</span>
+                    <p class="text-white font-bold text-lg mb-6">No aspiraciones. Fechas reales.</p>
+                    <div class="eco-timeline">
+                        <div class="eco-tl-item done">
+                            <div class="eco-tl-year">✓ Completado · 2022</div>
+                            <div class="eco-tl-name">Cero plástico virgen en envíos</div>
+                            <div class="eco-tl-desc">Eliminamos todo el plástico de un solo uso de nuestra cadena logística.</div>
+                        </div>
+                        <div class="eco-tl-item done">
+                            <div class="eco-tl-year">✓ Completado · 2023</div>
+                            <div class="eco-tl-name">Oficinas 100% renovables</div>
+                            <div class="eco-tl-desc">Instalaciones alimentadas exclusivamente con energía solar y eólica.</div>
+                        </div>
+                        <div class="eco-tl-item">
+                            <div class="eco-tl-year">⟳ En progreso · 2026</div>
+                            <div class="eco-tl-name">Ropa 100% orgánica certificada</div>
+                            <div class="eco-tl-desc">Transición completa de toda la línea de merchandise a algodón GOTS.</div>
+                        </div>
+                        <div class="eco-tl-item">
+                            <div class="eco-tl-year">◯ Objetivo · 2027</div>
+                            <div class="eco-tl-name">Cadena logística neutra en CO₂</div>
+                            <div class="eco-tl-desc">Flota eléctrica en última milla y compensación total de emisiones de larga distancia.</div>
+                        </div>
+                        <div class="eco-tl-item">
+                            <div class="eco-tl-year">◯ Objetivo · 2030</div>
+                            <div class="eco-tl-name">Discográfica neutra en carbono</div>
+                            <div class="eco-tl-desc">Cero emisiones netas en toda la cadena de valor, verificado por terceros independientes.</div>
+                        </div>
+                    </div>
+                </div>
+ 
+                <!-- QUOTE -->
+                <div class="eco-quote-card">
+                    <blockquote>La música conecta personas. Queremos que también conecte con el planeta.</blockquote>
+                    <cite>— Fundadores · MuzeHub</cite>
+                </div>
+ 
+                <div class="eco-footer-note">© 2026 MuzeHub · Todos los derechos reservados</div>
+ 
             </section>
 
             <!-- SECCIÓN: DETALLE DE ARTISTA (CATÁLOGO) -->
