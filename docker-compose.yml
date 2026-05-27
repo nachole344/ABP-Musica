@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15
+    container_name: music_db
+    restart: always
+    environment:
+      POSTGRES_DB: musicdb
+      POSTGRES_USER: nunu
+      POSTGRES_PASSWORD: nunu123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/tablas.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    container_name: music_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgresql://nunu:nunu123@db:5432/musicdb
+      - SECRET_KEY=dev-secret-key-123
+    depends_on:
+      - db
+
+  panel-admin:
+    build: ./panel-admin
+    container_name: music_panel_admin
+    restart: always
+    ports:
+      - "5001:5001"
+    environment:
+      - DATABASE_URL=postgresql://nunu:nunu123@db:5432/musicdb
+      - SECRET_KEY=dev-secret-key-123
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

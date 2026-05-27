@@ -10,17 +10,17 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('admin.index') }}">🎵 Artist App</a>
+            <a class="navbar-brand fw-bold" href="{{ url_for('main.index') }}">🎵 Artist App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.list_artists') }}"><i class="bi bi-person-fill me-1"></i>Artistas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.list_albums') }}"><i class="bi bi-disc-fill me-1"></i>Álbumes</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.list_songs') }}"><i class="bi bi-music-note-beamed me-1"></i>Canciones</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.list_products') }}"><i class="bi bi-bag-fill me-1"></i>Tienda</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.musicbrainz_import') }}"><i class="bi bi-cloud-download me-1"></i>Import</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.list_artists') }}"><i class="bi bi-person-fill me-1"></i>Artistas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.list_albums') }}"><i class="bi bi-disc-fill me-1"></i>Álbumes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.list_songs') }}"><i class="bi bi-music-note-beamed me-1"></i>Canciones</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.list_products') }}"><i class="bi bi-bag-fill me-1"></i>Tienda</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('main.musicbrainz_import') }}"><i class="bi bi-cloud-download me-1"></i>Import</a></li>
                 </ul>
             </div>
         </div>
