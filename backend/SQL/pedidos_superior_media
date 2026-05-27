@@ -1,0 +1,17 @@
+SELECT
+    o.order_id,
+    o.order_date,
+    o.status,
+    COUNT(oi.order_item_id)      AS lineas_pedido,
+    SUM(oi.quantity * oi.price)  AS total_calculado,
+    o.total_price                AS total_registrado
+FROM orders o
+INNER JOIN order_items oi ON o.order_id = oi.order_id
+GROUP BY o.order_id, o.order_date, o.status, o.total_price
+HAVING SUM(oi.quantity * oi.price) > (
+    -- subconsulta: precio medio de todos los pedidos
+    SELECT AVG(total_price)
+    FROM   orders
+    WHERE  status NOT IN ('cancelled')
+)
+ORDER BY total_calculado DESC;
