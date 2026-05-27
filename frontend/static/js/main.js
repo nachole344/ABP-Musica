@@ -74,11 +74,68 @@ async function fetchArtists() {
 async function fetchProducts() {
     try {
         const response = await fetch('http://fuertes:5000/api/shop/', { credentials: 'include' });
-        if (!response.ok) throw new Error('API no disponible');
-        productsData = await response.json();
-        renderProducts();
+
+        // Si el backend responde pero devuelve un array vacío (la BD no tiene datos aún)
+        const data = await response.json();
+
+        if (data.length === 0) {
+            console.warn('La base de datos está vacía. Cargando datos simulados (Mock)...');
+            productsData = mockProducts;
+        } else {
+            productsData = data;
+        }
+
+        renderProducts(productsData);
+
     } catch (error) {
-        console.warn('Cargando mock data para tienda...');
+        // Si el backend ni siquiera está encendido, caemos aquí
+        console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
+        productsData = mockProducts;
+        renderProducts(productsData);
+    }
+}
+
+async function fetchOrders() {
+    try {
+        const response = await fetch('http://fuertes:5000/api/orders/', { credentials: 'include' });
+        const data = await response.json();
+
+        if (data.length === 0) {
+            console.warn('La base de datos está vacía. Cargando datos simulados (Mock)...');
+            ordersData = mockOrders;
+        } else {
+            ordersData = data;
+        }
+
+        fetchOrdersItems();
+
+    } catch (error) {
+        // Si el backend ni siquiera está encendido, caemos aquí
+        console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
+        ordersData = mockOrders;
+        fetchOrdersItems();
+    }
+}
+
+async function fetchOrdersItems() {
+    try {
+        const response = await fetch('http://fuertes:5000/api/order_items/', { credentials: 'include' });
+        const data = await response.json();
+
+        if (data.length === 0) {
+            console.warn('La base de datos está vacía. Cargando datos simulados (Mock)...');
+            orderItemsData = mockOrderItems;
+        } else {
+            orderItemsData = data;
+        }
+
+        renderOrders();
+
+    } catch (error) {
+        // Si el backend ni siquiera está encendido, caemos aquí
+        console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
+        orderItemsData = mockOrderItems;
+        renderOrders();
     }
 }
 

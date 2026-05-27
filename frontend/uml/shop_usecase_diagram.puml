@@ -1,0 +1,38 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Usuario" as U
+actor "Admin" as A
+
+package "Tienda" {
+  ' Usos del Usuario '
+  usecase "Ver catálogo de productos" as UC1
+  usecase "Filtrar productos por categoría y/o artista" as UC2
+  usecase "Añadir producto al carrito" as UC3
+  usecase "Ver panel del carrito" as UC4
+  usecase "Eliminar producto del carrito" as UC5
+  usecase "Vaciar carrito" as UC6
+  usecase "Procesar pedido" as UC7
+  usecase "Ver historial de pedidos" as UC8
+
+  ' Usos del Administrador '
+  usecase "Añadir productos" as UC9
+  usecase "Eliminar productos" as UC10
+  usecase "Editar productos" as UC11
+}
+
+U --> UC1
+U --> UC2
+U --> UC3
+U --> UC4
+U --> UC5
+U --> UC6
+U --> UC7
+U --> UC8
+
+A --> UC9
+A --> UC10
+A --> UC11
+
+@enduml
