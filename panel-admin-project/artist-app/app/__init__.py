@@ -16,7 +16,7 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db)
-    csrf.init_app(app)
+    CORS(app, supports_credentials=True)
 
     from app.routes import bp as main_bp
     app.register_blueprint(main_bp)
@@ -24,6 +24,11 @@ def create_app(config_class=Config):
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix="/api")
 
-    csrf.exempt(api_bp)
+    @app.route("/")
+    def root_redirect():
+        from flask import session as flask_session
+        if 'user_id' in flask_session:
+            return redirect(url_for("main.index"))
+        return redirect(url_for("main.login_view"))
 
     return app
