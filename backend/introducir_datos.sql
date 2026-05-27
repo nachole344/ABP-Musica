@@ -108,4 +108,4 @@ INSERT INTO users
 (username, password)
 VALUES
 ('user1', 'user123'),
-('fan_rosalia', 'motomami');
+('admin', 'admin123');
