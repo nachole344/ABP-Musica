@@ -15,7 +15,7 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db)
-    CORS(app)
+    CORS(app, supports_credentials=True)
 
     from app.routes import bp as main_bp
     app.register_blueprint(main_bp, url_prefix="/admin")
@@ -25,6 +25,9 @@ def create_app(config_class=Config):
 
     @app.route("/")
     def root_redirect():
-        return redirect(url_for("main.index"))
+        from flask import session as flask_session
+        if 'user_id' in flask_session:
+            return redirect(url_for("main.index"))
+        return redirect(url_for("main.login_view"))
 
     return app
