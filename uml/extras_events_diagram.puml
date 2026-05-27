@@ -1,0 +1,18 @@
+@startuml
+start
+:Acceder a la sección "Extras & Events";
+:Cargar eventos (fetchEvents);
+:Renderizar todos los eventos;
+:Clic en Reservar;
+:Introducir datos;
+:Introducir método de pago;
+
+if (¿Confirmar reserva en prompt?) then (sí)
+    :Añadir reserva;
+    :Mostrar alerta: "Pago finalizado";
+    :Actualizar vista de eventos;
+else (no)
+    :Cancelar confirmación;
+endif
+stop
+@enduml
