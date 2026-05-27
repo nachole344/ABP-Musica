@@ -198,11 +198,13 @@ CREATE TABLE IF NOT EXISTS users (
 user_id INT GENERATED ALWAYS AS IDENTITY,
 username VARCHAR(50),
 password VARCHAR(50),
+date TIMESTAMP DEFAULT NOW(),
 
 CONSTRAINT pk_users_user_id PRIMARY KEY (user_id),
 
 CONSTRAINT nn_users_username CHECK (username IS NOT NULL),
 CONSTRAINT nn_users_password CHECK (password IS NOT NULL),
+CONSTRAINT nn_users_date CHECK (date IS NOT NULL),
 
 CONSTRAINT uk_users_username UNIQUE (username)
 );
