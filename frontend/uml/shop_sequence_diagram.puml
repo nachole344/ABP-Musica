@@ -1,0 +1,55 @@
+@startuml
+actor Usuario
+participant "Frontend\n(main.js / HTML)" as UI
+participant "Backend\n(Flask API)" as API
+database "Base de Datos\n(PostgreSQL)" as DB
+
+== Carga inicial de la tienda ==
+Usuario -> UI: Selecciona la vista de Tienda
+UI -> API: GET /api/products/
+activate API
+API -> DB: SELECT * FROM products
+activate DB
+DB --> API: Retorna registros de productos
+API --> UI: Retorna JSON con catálogo
+UI --> Usuario: Renderiza la cuadrícula de productos
+UI -> API: GET /api/orders/
+API -> DB: SELECT * FROM orders
+DB --> API: Retorna un registro de los pedidos
+API --> UI: Retorna JSON con los pedidos anteriores
+UI -> API: GET /api/order_items
+API -> DB: SELECT * FROM order_items
+DB --> API: Retorna un registro de los productos de cada pedido
+deactivate DB
+API --> UI: Retorna JSON con los productos de los pedidos anteriores
+deactivate API
+UI --> Usuario: Guarda los pedidos anteriores para mostrarse cuando se pida
+
+== Interacción con el carrito ==
+Usuario -> UI: Modifica cantidad y pulsa en "Añadir"
+activate UI
+UI -> UI: Busca ID en 'productsData'
+UI -> UI: Inserta o suma cantidad en 'cart[]'
+UI -> UI: Actualiza contador de UI (updateCartCounter)
+UI --> Usuario: Despliega panel lateral del carrito (openCart)
+deactivate UI
+
+== Procesamiento del Pedido ==
+Usuario -> UI: Clic en "PROCESAR PEDIDO"
+activate UI
+UI -> Usuario: confirm("¿Desea continuar con el pago?")
+Usuario --> UI: Acepta confirmación
+UI -> UI: alert("Pago finalizado")
+UI -> UI: cart = [] (Limpia memoria local)
+UI -> UI: renderCart() (Vacía visualmente el panel)
+UI --> Usuario: Muestra carrito vacío
+deactivate UI
+
+== Ver historial de Pedidos ==
+Usuario -> UI: Clic en el icono del historial de pedidos
+activate UI
+UI -> UI: Busca los pedidos anteriores y sus productos en sus JSON correspondientes
+UI -> UI: Cierra el carrito
+UI --> Usuario: Despliega un modal con los pedidos anteriores y sus productos (showPrviousOrders)
+
+@enduml

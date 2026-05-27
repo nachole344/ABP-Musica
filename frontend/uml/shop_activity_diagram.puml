@@ -1,0 +1,39 @@
+@startuml
+start
+:Acceder a la sección "Tienda";
+:Cargar productos (fetchProducts);
+
+if (¿Aplicar filtro?) then (sí)
+    :Seleccionar filtro de búsqueda (filterProducts);
+    :Renderizar productos filtrados;
+else (no)
+    :Renderizar todos los productos;
+endif
+
+:Indicar cantidad y seleccionar "Añadir al carrito";
+:Añadir producto al array local 'cart';
+:Actualizar contador y abrir panel lateral del carrito;
+
+if (¿Procesar pedido?) then (sí)
+    :Hacer clic en "PROCESAR PEDIDO" (goToOrders);
+    if (¿Carrito vacío?) then (sí)
+        :Mostrar alerta: "¡Añade productos antes de procesar!";
+    else (no)
+        if (¿Confirmar pago en prompt?) then (sí)
+            :Mostrar alerta: "Pago finalizado";
+            :Vaciar carrito (cart = []);
+            :Actualizar vista del carrito;
+        else (no)
+            :Cancelar confirmación;
+        endif
+    endif
+else (no)
+    if (¿Ver historial de pedidos?) then (si)
+        :Hacer clic en el icono del historial (showPrviousOrders);
+        :Mostrar un modal con el historial de pedidos;
+    else (no)
+        :Cerrar panel o seguir comprando;
+    endif
+endif
+stop
+@enduml

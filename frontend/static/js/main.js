@@ -206,7 +206,7 @@ async function fetchArtists() {
 
 async function fetchProducts() {
     try {
-        const response = await fetch('http://localhost:5000/api/products/');
+        const response = await fetch('http://fuertes:5000/api/shop/', { credentials: 'include' });
 
         // Si el backend responde pero devuelve un array vacío (la BD no tiene datos aún)
         const data = await response.json();
@@ -230,7 +230,7 @@ async function fetchProducts() {
 
 async function fetchOrders() {
     try {
-        const response = await fetch('http://localhost:5000/api/orders/');
+        const response = await fetch('http://fuertes:5000/api/orders/', { credentials: 'include' });
         const data = await response.json();
 
         if (data.length === 0) {
@@ -252,7 +252,7 @@ async function fetchOrders() {
 
 async function fetchOrdersItems() {
     try {
-        const response = await fetch('http://localhost:5000/api/order_items/');
+        const response = await fetch('http://fuertes:5000/api/order_items/', { credentials: 'include' });
         const data = await response.json();
 
         if (data.length === 0) {
