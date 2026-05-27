@@ -1,3 +1,4 @@
+import uuid
 from ..init import db
 
 class Album(db.Model):
@@ -10,7 +11,7 @@ class Album(db.Model):
     total_track = db.Column(db.Integer, nullable=False)
     cover_album = db.Column(db.Text, nullable=False, unique=True)
     spotify = db.Column(db.Text, nullable=False, unique=True)
-    mb_album_id = db.Column(db.Text, unique=True)
+    mb_album_id = db.Column(db.UUID(as_uuid=True), nullable=False, unique=True, default=uuid.uuid4)
 
     # Relationships
     songs = db.relationship('Song', backref='album', lazy=True)

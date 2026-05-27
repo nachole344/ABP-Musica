@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS users (
 user_id INT GENERATED ALWAYS AS IDENTITY,
 username VARCHAR(50),
 password VARCHAR(50),
-is_admin BOOLEAN DEFAULT FALSE,
+role VARCHAR(20) DEFAULT 'user',
 
 CONSTRAINT pk_users_user_id PRIMARY KEY (user_id),
 

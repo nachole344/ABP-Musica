@@ -236,6 +236,33 @@
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.5s ease forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ECO SECTION */
+        .eco-section-label { font-size:.65rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#10b981; margin-bottom:.85rem; display:block; }
+        .eco-intro-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:2rem 2.5rem; position:relative; overflow:hidden; margin-bottom:2.5rem; max-width:860px; }
+        .eco-intro-card::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,#10b981 0%,transparent 65%); }
+        .eco-metrics-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2.5rem; }
+        .eco-metric-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:1.75rem; position:relative; transition:border-color .25s,background .25s; }
+        .eco-metric-card:hover { border-color:rgba(16,185,129,.35); background:rgba(255,255,255,.06); }
+        .eco-metric-icon { width:34px; height:34px; background:rgba(16,185,129,.12); border-radius:9px; display:flex; align-items:center; justify-content:center; position:absolute; top:1.4rem; right:1.4rem; color:#10b981; }
+        .eco-metric-num { font-size:2.6rem; font-weight:800; color:#10b981; line-height:1; letter-spacing:-.04em; margin-bottom:.2rem; }
+        .eco-metric-label { font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.45); margin-bottom:.4rem; }
+        .eco-metric-desc { font-size:.78rem; color:rgba(255,255,255,.28); line-height:1.5; font-weight:300; }
+        .eco-pillars-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2.5rem; }
+        .eco-pillar-card { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:18px; padding:2rem; transition:border-color .25s; }
+        .eco-pillar-card:hover { border-color:rgba(16,185,129,.3); }
+        .eco-pillar-num { font-size:.65rem; font-weight:700; letter-spacing:.15em; color:#10b981; opacity:.65; margin-bottom:.85rem; }
+        .eco-pillar-ico { width:40px; height:40px; background:rgba(16,185,129,.12); border-radius:11px; display:flex; align-items:center; justify-content:center; color:#10b981; margin-bottom:.9rem; }
+        .eco-pillar-card h3 { font-size:.95rem; font-weight:700; color:#fff; margin-bottom:.45rem; }
+        .eco-pillar-card p { font-size:.8rem; color:rgba(255,255,255,.38); line-height:1.65; font-weight:300; }
+        .eco-tag { display:inline-block; margin-top:1.1rem; font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#10b981; background:rgba(16,185,129,.1); padding:.28rem .7rem; border-radius:100px; }
+        .eco-quote-card { background:rgba(16,185,129,.07); border:1px solid rgba(16,185,129,.18); border-radius:20px; padding:2.25rem 2.5rem; margin-bottom:2.5rem; max-width:860px; position:relative; }
+        .eco-quote-card::before { content:'"'; position:absolute; top:.75rem; left:2rem; font-size:4rem; color:#10b981; opacity:.18; font-weight:900; line-height:1; }
+        .eco-quote-card blockquote { font-size:1.05rem; font-weight:500; color:#fff; line-height:1.65; margin-bottom:.75rem; }
+        .eco-quote-card cite { font-size:.7rem; color:#10b981; font-style:normal; letter-spacing:.1em; text-transform:uppercase; font-weight:700; opacity:.65; }
+        .eco-footer-note { font-size:.68rem; color:rgba(255,255,255,.18); letter-spacing:.05em; padding-bottom:1rem; }
+        @media(max-width:992px) { .eco-metrics-grid { grid-template-columns:1fr 1fr; } .eco-pillars-grid { grid-template-columns:1fr; } }
+        @media(max-width:576px) { .eco-metrics-grid { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
@@ -271,7 +298,7 @@
 
             <!-- BOTÓN LOGIN (Inferior) -->
             <div class="mt-auto w-100">
-                <a id="nav-admin-panel" class="sidebar-link hidden" href="http://localhost:5001/">
+                <a id="nav-admin-panel" class="sidebar-link hidden" href="/admin/">
                     <i data-lucide="layout-dashboard" class="text-blue-500"></i>
                     <span class="nav-label text-blue-500">Panel Admin</span>
                 </a>
@@ -330,9 +357,61 @@
 
             <!-- SECCIÓN: TIENDA -->
             <section id="shop-section" class="content-overlay">
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-12">MUSIC <span class="text-red-500">STORE</span></h1>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="shop-container">
-                    <!-- Productos dinámicos -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                    <h1 class="text-5xl md:text-7xl font-extrabold">MUSIC <span class="text-red-500">STORE</span></h1>
+                    <button onclick="openCart()"
+                        class="flex items-center gap-3 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-full font-bold transition-all w-fit">
+                        <i data-lucide="shopping-cart"></i>
+                        <span>Carrito (<span id="cart-count">0</span>)</span>
+                    </button>
+                </div>
+
+                <div class="flex flex-wrap gap-3 mb-10">
+                    <button class="px-5 py-2 bg-white/10 text-white rounded-full hover:bg-red-500 focus:bg-red-500 transition-colors font-semibold" onclick="filterProducts('all')">Todos</button>
+                    <button class="px-5 py-2 bg-white/10 text-white rounded-full hover:bg-red-500 focus:bg-red-500 transition-colors font-semibold" onclick="filterProducts('album')">Álbumes</button>
+                    <button class="px-5 py-2 bg-white/10 text-white rounded-full hover:bg-red-500 focus:bg-red-500 transition-colors font-semibold" onclick="filterProducts('vinyl')">Vinilos</button>
+                    <button class="px-5 py-2 bg-white/10 text-white rounded-full hover:bg-red-500 focus:bg-red-500 transition-colors font-semibold" onclick="filterProducts('clothing')">Ropa</button>
+                    <button class="px-5 py-2 bg-white/10 text-white rounded-full hover:bg-red-500 focus:bg-red-500 transition-colors font-semibold" onclick="filterProducts('tote_bag')">Tote Bags</button>
+                    <button class="px-5 py-2 bg-white/10 text-white rounded-full hover:bg-red-500 focus:bg-red-500 transition-colors font-semibold" onclick="filterProducts('pin')">Pines</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8" id="shop-container"></div>
+
+                <div id="cart-overlay" class="fixed inset-0 bg-black/80 z-[2000] hidden opacity-0 transition-opacity duration-300" onclick="closeCart()"></div>
+
+                <div id="cartSidebar" class="fixed top-0 right-0 h-full w-full max-w-md bg-zinc-950 border-l border-white/10 z-[2010] transform translate-x-full transition-transform duration-300 flex flex-col">
+                    <div class="flex items-center justify-between p-6 border-b border-white/10">
+                        <h2 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="shopping-basket"></i> Tu Carrito</h2>
+                        <div>
+                            <button onclick="showPrviousOrders()" class="p-2 hover:bg-white/10 text-slate-400 hover:text-white rounded-full transition-colors">
+                                <i data-lucide="history"></i>
+                            </button>
+                            <button onclick="closeCart()" class="p-2 hover:bg-white/10 text-slate-400 hover:text-white rounded-full transition-colors">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="cartItems" class="flex-grow overflow-y-auto p-6 space-y-4"></div>
+                    <div class="p-6 border-t border-white/10 bg-zinc-900/50">
+                        <div class="flex justify-between items-center mb-6">
+                            <span class="text-lg text-slate-400">Total Estimado</span>
+                            <span id="cartTotal" class="text-3xl font-black">0.00€</span>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="goToOrders()" class="w-3/4 py-4 bg-white text-black font-bold rounded-xl hover:bg-slate-200 transition-colors flex justify-center items-center">PROCESAR PEDIDO</button>
+                            <button onclick="emptyCart()" class="w-1/4 py-4 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors flex justify-center items-center"><i data-lucide="trash-2"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="orders-modal-overlay" class="fixed inset-0 bg-black/80 z-[3000] hidden opacity-0 transition-opacity duration-300 flex items-center justify-center p-4">
+                    <div id="orders-modal-content" class="bg-zinc-900 border-red-500 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col transform scale-95 transition-transform duration-300 shadow-2xl">
+                        <div class="flex items-center justify-between p-6 border-b border-red-500">
+                            <h2 class="text-2xl font-bold flex items-center gap-2 text-white"><i data-lucide="history"></i> Historial de Pedidos</h2>
+                            <button onclick="closeOrdersModal()" class="p-2 hover:bg-white/10 text-slate-400 hover:text-white rounded-full transition-colors"><i data-lucide="x"></i></button>
+                        </div>
+                        <div id="orders-container" class="p-6 overflow-y-auto space-y-6 flex-grow"></div>
+                    </div>
                 </div>
             </section>
 
@@ -346,10 +425,32 @@
 
             <!-- SECCIÓN: SOSTENIBILIDAD -->
             <section id="sustainability-section" class="content-overlay">
-                <h1 class="text-5xl md:text-7xl font-extrabold mb-12 text-emerald-500">ECO <span class="text-white">MISSION</span></h1>
-                <div class="bg-white/5 p-6 md:p-12 rounded-3xl border border-white/10 max-w-4xl">
-                    <p class="text-xl md:text-2xl text-slate-300 leading-relaxed mb-8">Nuestra plataforma está diseñada para minimizar el impacto ambiental de la industria musical...</p>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-3"><span class="text-emerald-500">ECO</span> <span class="text-white">MISSION</span></h1>
+                <p class="text-slate-400 mb-10 text-sm font-medium tracking-widest uppercase">MuzeHub · Compromiso ambiental 2026</p>
+                <div class="eco-intro-card">
+                    <p class="text-lg text-slate-300 leading-relaxed">Nuestra plataforma está diseñada para <strong class="text-white">minimizar el impacto ambiental de la industria musical</strong>. Desde los vinilos que prensan nuestros artistas hasta la camiseta que llevas a un concierto, cada decisión lleva el sello de nuestra misión ecológica. En <strong class="text-emerald-400">2030</strong> queremos ser una discográfica completamente neutra en carbono.</p>
                 </div>
+                <span class="eco-section-label">Impacto real · 2025</span>
+                <div class="eco-metrics-grid">
+                    <div class="eco-metric-card"><div class="eco-metric-icon"><i data-lucide="recycle" size="16"></i></div><div class="eco-metric-num">87%</div><div class="eco-metric-label">Materiales reciclados</div><div class="eco-metric-desc">Del total de packaging de vinilos y álbumes producidos este año.</div></div>
+                    <div class="eco-metric-card"><div class="eco-metric-icon"><i data-lucide="tree-pine" size="16"></i></div><div class="eco-metric-num">12k</div><div class="eco-metric-label">Árboles plantados</div><div class="eco-metric-desc">Reforestación activa en España y Latinoamérica con ONGs locales.</div></div>
+                    <div class="eco-metric-card"><div class="eco-metric-icon"><i data-lucide="sun" size="16"></i></div><div class="eco-metric-num">100%</div><div class="eco-metric-label">Energía renovable</div><div class="eco-metric-desc">Oficinas y almacenes con energía solar y eólica desde 2023.</div></div>
+                    <div class="eco-metric-card"><div class="eco-metric-icon"><i data-lucide="truck" size="16"></i></div><div class="eco-metric-num">−40%</div><div class="eco-metric-label">Emisiones de envío</div><div class="eco-metric-desc">Reducción con flota eléctrica y rutas optimizadas.</div></div>
+                    <div class="eco-metric-card"><div class="eco-metric-icon"><i data-lucide="package-x" size="16"></i></div><div class="eco-metric-num">0</div><div class="eco-metric-label">Plástico virgen</div><div class="eco-metric-desc">Eliminado completamente de todos nuestros envíos desde 2022.</div></div>
+                    <div class="eco-metric-card"><div class="eco-metric-icon"><i data-lucide="badge-check" size="16"></i></div><div class="eco-metric-num">GOTS</div><div class="eco-metric-label">Ropa certificada</div><div class="eco-metric-desc">Toda la línea de ropa lleva certificación orgánica internacional.</div></div>
+                </div>
+                <span class="eco-section-label">Nuestros pilares</span>
+                <div class="eco-pillars-grid">
+                    <div class="eco-pillar-card"><div class="eco-pillar-num">01 —</div><div class="eco-pillar-ico"><i data-lucide="factory" size="18"></i></div><h3>Producción consciente</h3><p>Trabajamos con prensadoras de vinilos que usan PVC reciclado e imprentas certificadas FSC.</p><span class="eco-tag">Fabricación · Materiales</span></div>
+                    <div class="eco-pillar-card"><div class="eco-pillar-num">02 —</div><div class="eco-pillar-ico"><i data-lucide="shirt" size="18"></i></div><h3>Moda que respira</h3><p>Ropa y bolsas de algodón orgánico certificado, tintas a base de agua y etiquetas en papel reciclado.</p><span class="eco-tag">Ropa · Bolsas · Pines</span></div>
+                    <div class="eco-pillar-card"><div class="eco-pillar-num">03 —</div><div class="eco-pillar-ico"><i data-lucide="truck" size="18"></i></div><h3>Envíos sin huella</h3><p>Logística con flota eléctrica en última milla. Agrupamos pedidos y compensamos el 100% de las emisiones.</p><span class="eco-tag">Logística · Packaging</span></div>
+                    <div class="eco-pillar-card"><div class="eco-pillar-num">04 —</div><div class="eco-pillar-ico"><i data-lucide="mic-2" size="18"></i></div><h3>Artistas como activistas</h3><p>Cada artista firma nuestro compromiso medioambiental. Parte de los royalties va a proyectos de conservación.</p><span class="eco-tag">Comunidad · Artistas</span></div>
+                </div>
+                <div class="eco-quote-card">
+                    <blockquote>La música conecta personas. Queremos que también conecte con el planeta.</blockquote>
+                    <cite>— Fundadores · MuzeHub</cite>
+                </div>
+                <div class="eco-footer-note">© 2026 MuzeHub · Todos los derechos reservados</div>
             </section>
 
             <!-- SECCIÓN: DETALLE DE ARTISTA (CATÁLOGO) -->
@@ -362,24 +463,54 @@
                     <!-- El contenido se generará dinámicamente -->
                 </div>
             </section>
-            <!-- SECCIÓN: LOGIN -->
+            <!-- SECCIÓN: LOGIN / REGISTRO -->
             <section id="login-section" class="content-overlay flex-col items-center justify-center">
                 <div class="glass-card p-10 rounded-3xl border border-white/10 w-full max-w-md">
-                    <h2 class="text-4xl font-black mb-8 text-center">USER <span class="text-blue-500">LOGIN</span></h2>
-                    <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-400 mb-2">USUARIO</label>
-                            <input type="text" id="login-username" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-400 mb-2">CONTRASEÑA</label>
-                            <input type="password" id="login-password" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
-                        </div>
-                        <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02]">
-                            ENTRAR AL PANEL
-                        </button>
-                    </form>
-                    <p id="login-error" class="mt-4 text-red-500 text-center font-bold hidden">Credenciales incorrectas</p>
+                    <!-- Tabs -->
+                    <div class="flex mb-8 border border-white/10 rounded-xl overflow-hidden">
+                        <button id="tab-login" onclick="switchAuthTab('login')"
+                            class="flex-1 py-3 text-sm font-bold transition-colors bg-blue-600 text-white">INICIAR SESIÓN</button>
+                        <button id="tab-register" onclick="switchAuthTab('register')"
+                            class="flex-1 py-3 text-sm font-bold transition-colors bg-transparent text-slate-400 hover:text-white">REGISTRARSE</button>
+                    </div>
+
+                    <!-- Login form -->
+                    <div id="auth-login-panel">
+                        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-400 mb-2">USUARIO</label>
+                                <input type="text" id="login-username" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-400 mb-2">CONTRASEÑA</label>
+                                <input type="password" id="login-password" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
+                            </div>
+                            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02]">
+                                ENTRAR
+                            </button>
+                        </form>
+                        <p id="login-error" class="mt-4 text-red-500 text-center font-bold hidden">Credenciales incorrectas</p>
+                    </div>
+
+                    <!-- Register form -->
+                    <div id="auth-register-panel" class="hidden">
+                        <form id="register-form" onsubmit="handleRegister(event)" class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-400 mb-2">USUARIO</label>
+                                <input type="text" id="register-username" maxlength="50" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-400 mb-2">CONTRASEÑA</label>
+                                <input type="password" id="register-password" maxlength="50" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-blue-500 transition-colors" required>
+                            </div>
+                            <button type="submit" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02]">
+                                CREAR CUENTA
+                            </button>
+                        </form>
+                        <p id="register-error" class="mt-4 text-red-500 text-center font-bold hidden"></p>
+                        <p id="register-success" class="mt-4 text-emerald-400 text-center font-bold hidden"></p>
+                    </div>
+
                     <button onclick="hideLogin()" class="mt-6 w-full text-slate-500 hover:text-white transition-colors text-sm font-bold">CANCELAR</button>
                 </div>
             </section>
@@ -388,6 +519,6 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="static/js/main.js"></script>
+    <script src="static/js/main.js?v=4"></script>
 </body>
 </html>

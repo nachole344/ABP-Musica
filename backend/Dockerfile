@@ -24,4 +24,4 @@ COPY . .
 EXPOSE 5000
 
 # Comando para ejecutar la aplicación
-CMD ["python", "run.py"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "run:app"]

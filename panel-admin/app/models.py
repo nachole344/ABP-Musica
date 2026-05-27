@@ -6,13 +6,13 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
+    role = db.Column(db.String(20), nullable=False, default='user')
 
     def to_dict(self):
         return {
             "user_id": self.user_id,
             "username": self.username,
-            "is_admin": self.is_admin
+            "role": self.role,
         }
 
 class Artist(db.Model):

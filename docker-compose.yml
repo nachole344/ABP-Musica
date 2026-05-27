@@ -4,14 +4,20 @@ services:
     container_name: music_db
     restart: always
     environment:
-      POSTGRES_DB: musicdb
-      POSTGRES_USER: nunu
-      POSTGRES_PASSWORD: nunu123
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/tablas.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   backend:
     build: ./backend
@@ -20,10 +26,11 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - DATABASE_URL=postgresql://nunu:nunu123@db:5432/musicdb
-      - SECRET_KEY=dev-secret-key-123
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - SECRET_KEY=${SECRET_KEY}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   panel-admin:
     build: ./panel-admin
@@ -32,10 +39,23 @@ services:
     ports:
       - "5001:5001"
     environment:
-      - DATABASE_URL=postgresql://nunu:nunu123@db:5432/musicdb
-      - SECRET_KEY=dev-secret-key-123
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - SECRET_KEY=${SECRET_KEY}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: nginx:alpine
+    container_name: music_frontend
+    restart: always
+    ports:
+      - "8000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:

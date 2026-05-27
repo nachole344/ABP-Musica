@@ -1,3 +1,4 @@
+import uuid
 from ..init import db
 
 class Song(db.Model):
@@ -9,7 +10,7 @@ class Song(db.Model):
     duration = db.Column(db.Time, nullable=False)
     video_url = db.Column(db.Text, unique=True)
     cover_song = db.Column(db.Text, nullable=False, unique=True)
-    mb_song_id = db.Column(db.Text, unique=True)
+    mb_song_id = db.Column(db.UUID(as_uuid=True), nullable=False, unique=True, default=uuid.uuid4)
 
     def to_dict(self):
         return {

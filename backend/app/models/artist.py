@@ -1,3 +1,4 @@
+import uuid
 from ..init import db
 
 class Artist(db.Model):
@@ -12,7 +13,7 @@ class Artist(db.Model):
     social_media = db.Column(db.Text, nullable=False, unique=True)
     image = db.Column(db.Text, nullable=False, unique=True)
     description = db.Column(db.Text)
-    mb_id = db.Column(db.Text, unique=True) # UUID stored as Text for compatibility
+    mb_id = db.Column(db.UUID(as_uuid=True), nullable=False, unique=True, default=uuid.uuid4)
 
     # Relationships
     albums = db.relationship('Album', backref='artist', lazy=True)
