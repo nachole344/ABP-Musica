@@ -2,6 +2,140 @@ let currentArtistIndex = 0;
 let artistsData = [];
 let productsData = [];
 let eventsData = [];
+let ordersData = [];
+let orderItemsData = [];
+let cart = []; // Array para guardar los preductos que se desean comprar
+
+// MOCK DATA temporal para provar el funcionamiento de los productos
+const mockProducts = [
+    {
+        product_id: 1,
+        product_name: "Álbum 'Echoes en la Noche'",
+        product_type: "album",
+        price: 15.99,
+        image_url: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+        product_id: 2,
+        product_name: "Vinilo Edición Especial Clásicos",
+        product_type: "vinyl",
+        price: 35.50,
+        image_url: "https://images.unsplash.com/photo-1538688423619-a81d3f23454b?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+        product_id: 3,
+        product_name: "Camiseta Tour 2024 (Negra)",
+        product_type: "clothing",
+        price: 25.00,
+        image_url: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+        product_id: 4,
+        product_name: "Tote Bag Sostenible Algodón",
+        product_type: "tote_bag",
+        price: 12.00,
+        image_url: "https://images.unsplash.com/photo-1597423235375-14f7623a31eb?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+        product_id: 5,
+        product_name: "Sudadera SoundScape Premium",
+        product_type: "clothing",
+        price: 45.00,
+        image_url: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+        product_id: 6,
+        product_name: "Pin Metálico Logo Banda",
+        product_type: "pin",
+        price: 5.50,
+        image_url: "https://images.unsplash.com/photo-1611078716388-3485ba8051a8?auto=format&fit=crop&q=80&w=400"
+    }
+];
+
+const mockOrders = [
+    {
+        order_id: 1,
+        order_date: "2026-03-15",
+        total_price: 21.49,
+        status: "delivered"
+    },
+    {
+        order_id: 2,
+        order_date: "2026-05-20",
+        total_price: 85.50,
+        status: "paid"
+    },
+    {
+        order_id: 3,
+        order_date: "2026-05-21",
+        total_price: 87.50,
+        status: "pending"
+    },
+];
+
+const mockOrderItems = [
+    // --- PEDIDO 1 (Total: 21.49) ---
+    {
+        order_item_id: 1,
+        order_id: 1,
+        product_id: 1, // Álbum 'Echoes en la Noche'
+        quantity: 1,
+        price: 15.99
+    },
+    {
+        order_item_id: 2,
+        order_id: 1,
+        product_id: 6, // Pin Metálico Logo Banda
+        quantity: 1,
+        price: 5.50
+    },
+
+    // --- PEDIDO 2 (Total: 85.50) ---
+    {
+        order_item_id: 3,
+        order_id: 2,
+        product_id: 2, // Vinilo Edición Especial Clásicos
+        quantity: 1,
+        price: 35.50
+    },
+    {
+        order_item_id: 4,
+        order_id: 2,
+        product_id: 3, // Camiseta Tour 2024 (Negra)
+        quantity: 2,
+        price: 25.00
+    },
+
+    // --- PEDIDO 3 (Total: 87.50) ---
+    {
+        order_item_id: 5,
+        order_id: 3,
+        product_id: 5, // Sudadera SoundScape Premium
+        quantity: 1,
+        price: 45.00
+    },
+    {
+        order_item_id: 6,
+        order_id: 3,
+        product_id: 3, // Camiseta Tour 2024 (Negra)
+        quantity: 1,
+        price: 25.00
+    },
+    {
+        order_item_id: 7,
+        order_id: 3,
+        product_id: 4, // Tote Bag Sostenible Algodón
+        quantity: 1,
+        price: 12.00
+    },
+    {
+        order_item_id: 8,
+        order_id: 3,
+        product_id: 6, // Pin Metálico Logo Banda
+        quantity: 1,
+        price: 5.50
+    }
+];
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('SoundScape: Inicializando aplicación...');
@@ -11,16 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchArtists();
     fetchProducts();
     fetchEvents();
+    fetchOrders();
 });
 
 // NAVEGACIÓN GLOBAL (Sidebar y Mobile)
 function showSection(sectionId) {
     const sections = ['home', 'artists', 'shop', 'extras', 'sustainability'];
-    
+
     sections.forEach(s => {
         const element = document.getElementById(s + '-section');
         const navLink = document.getElementById('nav-' + s);
-        
+
         if (element) {
             element.classList.remove('active');
             // Aseguramos que las secciones de pantalla completa se oculten correctamente
@@ -153,7 +288,7 @@ async function fetchEvents() {
 function renderArtistSlides() {
     const container = document.getElementById('artists-slides-container');
     if (!container) return;
-    
+
     container.innerHTML = artistsData.map((artist, index) => `
         <div class="artist-slide ${index === 0 ? 'active' : ''}" id="slide-${index}">
             <video class="video-bg" autoplay muted loop playsinline>
@@ -166,26 +301,6 @@ function renderArtistSlides() {
             </div>
         </div>
     `).join('');
-}
-
-function renderProducts() {
-    const container = document.getElementById('shop-container');
-    if (!container) return;
-
-    container.innerHTML = productsData.map(product => `
-        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group">
-            <img src="${product.image_url}" class="w-full aspect-square object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" alt="${product.product_name}">
-            <h3 class="font-bold text-lg">${product.product_name}</h3>
-            <p class="text-slate-400 text-sm mb-4">${product.product_type}</p>
-            <div class="flex items-center justify-between">
-                <span class="text-2xl font-black">${product.price}€</span>
-                <button class="p-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors">
-                    <i data-lucide="shopping-cart" size="20"></i>
-                </button>
-            </div>
-        </div>
-    `).join('');
-    if (window.lucide) lucide.createIcons();
 }
 
 function renderEvents() {
@@ -215,7 +330,7 @@ function viewArtistCatalog(index) {
     const artist = artistsData[index];
     const catalogOverlay = document.getElementById('catalog-overlay');
     const catalogContent = document.getElementById('catalog-content');
-    
+
     if (!catalogOverlay || !catalogContent || !artist) {
         console.error('Error: No se encontró el overlay o el artista.');
         return;
@@ -269,7 +384,7 @@ function viewArtistCatalog(index) {
     setTimeout(() => {
         catalogOverlay.classList.add('active');
     }, 10);
-    
+
     if (window.lucide) lucide.createIcons();
 }
 
@@ -299,6 +414,317 @@ function updateSlide(newIndex) {
     if (nextSlide) nextSlide.classList.add('active');
 }
 
+// LÓGICA SHOP
+
+// Por defecto, usa todos los productos (productsData).
+function renderProducts(productsToRender = productsData) {
+    const container = document.getElementById('shop-container');
+    if (!container) return;
+
+    // Si no hay productos que mostrar, se enseña un mensaje avisando de ello.
+    if (productsToRender.length === 0) {
+        container.innerHTML = `<p class="text-slate-400 col-span-full text-center py-10">No hay productos disponibles en esta categoría.</p>`;
+        return;
+    }
+
+    // Se introduce todos los productos en el HTML
+    container.innerHTML = productsToRender.map(product => `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group flex flex-col justify-between">
+            <div>
+                <img src="${product.image_url}" class="w-full aspect-square object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" alt="${product.product_name}">
+                <h3 class="font-bold text-lg leading-tight mb-1">${product.product_name}</h3>
+                <p class="text-slate-400 text-xs font-semibold tracking-widest mb-4 uppercase">${product.product_type.replace('_', ' ')}</p>
+            </div>
+            <div class="flex items-center justify-between mt-4 gap-2">
+                <span class="text-xl font-black">${product.price.toFixed(2)}€</span>
+                
+                <div class="flex items-center gap-1.5">
+                    <input type="number" id="qty-${product.product_id}" value="1" min="1" 
+                           class="w-12 p-1.5 bg-white/10 text-white rounded-lg text-center text-sm font-bold border border-white/10 focus:outline-none focus:border-red-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                    
+                    <button class="p-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors" onclick="addToCart(${product.product_id})">
+                        <i data-lucide="shopping-cart" size="20"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Se recargan los iconos de Lucide para evitar errores.
+    if (window.lucide) lucide.createIcons();
+}
+
+// Filtra los productos comparando el parámetro con el product_type
+function filterProducts(type) {
+    if (type === 'all') {
+        renderProducts(productsData); // Muestra todos
+    } else {
+        const filtered = productsData.filter(p => p.product_type === type);
+        renderProducts(filtered); // Muestra solo los de la categoría
+    }
+}
+
+// LÓGICA CARRITO
+
+function openCart() {
+    const sidebar = document.getElementById("cartSidebar");
+    const overlay = document.getElementById("cart-overlay");
+
+    // Mostramos el overlay con una transición suave
+    overlay.classList.remove("hidden");
+    setTimeout(() => overlay.classList.remove("opacity-0"), 10);
+
+    // Deslizamos el sidebar hacia adentro
+    sidebar.classList.remove("translate-x-full");
+
+    // Renderizamos los datos más recientes
+    renderCart();
+}
+
+function closeCart() {
+    const sidebar = document.getElementById("cartSidebar");
+    const overlay = document.getElementById("cart-overlay");
+
+    // Ocultamos deslizando hacia la derecha
+    sidebar.classList.add("translate-x-full");
+
+    // Ocultamos el overlay suavemente
+    overlay.classList.add("opacity-0");
+    setTimeout(() => overlay.classList.add("hidden"), 300);
+}
+
+function addToCart(productId) {
+    const product = productsData.find(p => p.product_id === productId);
+    if (!product) return;
+
+    // Se revisa la cantidad que se quiere añadir
+    const qtyInput = document.getElementById(`qty-${productId}`);
+    const quantityToAdd = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
+    const existingItem = cart.find(item => item.product_id === productId);
+
+    if (existingItem) {
+        // Si ya hay productos de este tipo en el carrito, se suman la cantidad seleccionada a la cantidad que habia en el carrito
+        existingItem.quantity += quantityToAdd;
+    } else {
+        cart.push({ ...product, quantity: quantityToAdd });
+    }
+
+    // Se reinicia el contador
+    if (qtyInput) qtyInput.value = 1;
+
+    updateCartCounter();
+    renderCart();
+    openCart();
+}
+
+// Renderiza la lista dentro del Sidebar
+function renderCart() {
+    const list = document.getElementById("cartItems");
+    const totalElement = document.getElementById("cartTotal");
+    if (!list) return;
+
+    list.innerHTML = "";
+    let total = 0;
+
+    // Si el carrito está vacío, se muestra un mensaje indicandolo
+    if (cart.length === 0) {
+        list.innerHTML = `<p class="text-center text-slate-500 mt-10">Tu carrito está vacío.</p>`;
+        totalElement.innerText = "0.00€";
+        return;
+    }
+
+    // Se muestran todos los productos del carrito
+    cart.forEach((item) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+
+        list.innerHTML += `
+            <div class="flex items-center gap-4 bg-white/5 p-3 rounded-xl border border-white/5 justify-between hover:bborder-red-500 transition-colors">
+                <div class="flex items-center gap-3">
+                    <img src="${item.image_url}" alt="${item.product_name}" class="w-14 h-14 object-cover rounded-lg flex-shrink-0">
+                    <div>
+                        <h4 class="font-bold text-sm line-clamp-1 text-slate-200">${item.product_name}</h4>
+                        <p class="text-slate-400 text-xs">${item.price}€ x ${item.quantity}</p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+                    <span class="font-black text-sm">${itemTotal.toFixed(2)}€</span>
+                    <button onclick="removeFromCart(${item.product_id})" class="text-slate-500 hover:text-red-500 transition-colors p-1">
+                        <i data-lucide="trash" size="16"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+
+    totalElement.innerText = total.toFixed(2) + "€";
+
+    // Se reinician los iconos de Lucide para evitar errores
+    if (window.lucide) lucide.createIcons();
+}
+
+function goToOrders() {
+    if (cart.length === 0) {
+        alert("¡Añade productos antes de procesar el pedido!");
+        return;
+    }
+
+    if (confirm("¿Desea continuar con el pago?")) {
+        alert("Pago finalizado");
+        cart = [];
+        updateCartCounter();
+        renderCart();
+    }
+}
+
+// Actualiza el contador del carrito
+function updateCartCounter() {
+    const counter = document.getElementById('cart-count');
+    if (counter) {
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        counter.innerText = totalItems;
+    }
+}
+
+// Elimina un producto por completo del carrito independientemente de su cantidad
+function removeFromCart(productId) {
+    // Filtramos el array conservando todos los elementos excepto el que coincide con el ID
+    cart = cart.filter(item => item.product_id !== productId);
+
+    // Sincronizamos el contador y volvemos a dibujar el carrito
+    updateCartCounter();
+    renderCart();
+}
+
+// Vacía por completo el carrito
+function emptyCart() {
+    if (cart.length === 0) return;
+
+    // Pedimos confirmación al usuario para evitar clicks accidentales
+    if (confirm("¿Estás seguro de que deseas vaciar por completo tu carrito?")) {
+        cart = [];
+        updateCartCounter();
+        renderCart();
+    }
+}
+
+// LÓGICA DE LOS PEDIDOS
+function showPrviousOrders() {
+    const modalOverlay = document.getElementById('orders-modal-overlay');
+    const modalContent = document.getElementById('orders-modal-content');
+
+    // Muestra el modal con una transición suave (Fade in y zoom)
+    modalOverlay.classList.remove('hidden');
+    
+    // Un pequeño delay para que la transición CSS tenga efecto
+    setTimeout(() => {
+        modalOverlay.classList.remove('opacity-0');
+        modalContent.classList.remove('scale-95');
+    }, 10);
+
+    // Cerramos el carrito lateral por si estaba abierto
+    closeCart();
+    
+    // Renderizamos los pedidos
+    renderOrders();
+}
+
+function closeOrdersModal() {
+    const modalOverlay = document.getElementById('orders-modal-overlay');
+    const modalContent = document.getElementById('orders-modal-content');
+
+    // Oculta el modal con animación inversa
+    modalOverlay.classList.add('opacity-0');
+    modalContent.classList.add('scale-95');
+    
+    setTimeout(() => {
+        modalOverlay.classList.add('hidden');
+    }, 300);
+}
+
+function renderOrders() {
+    const container = document.getElementById('orders-container');
+    if (!container) return;
+
+    // Si no hay pedidos
+    if (!ordersData || ordersData.length === 0) {
+        container.innerHTML = `<p class="text-center text-slate-500 py-10 text-lg">Aún no tienes pedidos anteriores.</p>`;
+        return;
+    }
+
+    // Iteramos sobre todos los pedidos (del más reciente al más antiguo, por lo que le damos la vuelta con reverse())
+    container.innerHTML = [...ordersData].reverse().map(order => {
+        
+        // Se buscan los productos que pertenezcan al pedido
+        const orderItems = orderItemsData.filter(item => item.order_id === order.order_id);
+        
+        // Se inserta el HTML de cada pedido
+        const itemsHtml = orderItems.map(item => {
+            // Buscamos la info visual del producto usando el product_id
+            const productInfo = productsData.find(p => p.product_id === item.product_id);
+            
+            // Si por alguna razón no encuentra el producto, saltamos (para no romper la app)
+            if (!productInfo) return ''; 
+            
+            return `
+                <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+                    <div class="flex items-center gap-4">
+                        <img src="${productInfo.image_url}" alt="${productInfo.product_name}" class="w-14 h-14 object-cover rounded-lg flex-shrink-0">
+                        <div>
+                            <h5 class="text-sm font-bold text-slate-200 line-clamp-1">${productInfo.product_name}</h5>
+                            <p class="text-xs text-slate-400 mt-1">${item.quantity} ud. x ${item.price.toFixed(2)}€</p>
+                        </div>
+                    </div>
+                    <span class="font-bold text-slate-300">${(item.quantity * item.price).toFixed(2)}€</span>
+                </div>
+            `;
+        }).join('');
+
+        // Cambia el color según el estado del pedido
+        let statusClasses = "bg-slate-500/20 text-slate-400"; // Por defecto
+        let statusLabel = "Desconocido";
+        
+        if (order.status === "delivered") {
+            statusClasses = "bg-emerald-500/20 text-emerald-400";
+            statusLabel = "Entregado";
+        } else if (order.status === "paid") {
+            statusClasses = "bg-blue-500/20 text-blue-400";
+            statusLabel = "Pagado";
+        } else if (order.status === "pending") {
+            statusClasses = "bg-amber-500/20 text-amber-400";
+            statusLabel = "Pendiente";
+        }
+
+        // Se retorna la tarjeta
+        return `
+            <div class="bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 pb-4 border-b border-white/10 gap-4">
+                    <div>
+                        <h3 class="text-xl font-black text-white">Pedido #${order.order_id}</h3>
+                        <div class="flex items-center gap-2 mt-1">
+                            <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
+                            <span class="text-sm text-slate-400">${new Date(order.order_date).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between md:flex-col md:items-end gap-2">
+                        <span class="px-3 py-1 text-xs font-bold rounded-full border border-white/5 uppercase tracking-widest ${statusClasses}">
+                            ${statusLabel}
+                        </span>
+                        <span class="text-2xl font-black text-white">${order.total_price.toFixed(2)}€</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-1">
+                    ${itemsHtml}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    if (window.lucide) lucide.createIcons();
+}
 // LÓGICA DE LOGIN Y ADMIN
 function showLogin() {
     const loginSection = document.getElementById('login-section');
