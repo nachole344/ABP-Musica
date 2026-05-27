@@ -4,7 +4,7 @@ from functools import wraps
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app import db
-from app.models import Artist, Album, Song, Event, Product
+from app.models import Artist, Album, Song, Event, Product, User
 from app.musicbrainz_service import search_artist, search_albums, search_songs, search_events
 
 bp = Blueprint("main", __name__)
@@ -13,11 +13,37 @@ bp = Blueprint("main", __name__)
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session or not session.get('is_admin'):
-            # Si no es admin, redirigir al index del sitio principal o mostrar error
-            return "Acceso denegado. Se requieren permisos de administrador.", 403
+        if 'user_id' not in session:
+            return redirect(url_for("main.login_view"))
+        user = User.query.get(session['user_id'])
+        if not user or user.role != 'admin':
+            return redirect(url_for("main.login_view"))
         return f(*args, **kwargs)
     return decorated_function
+
+
+@bp.route("/login", methods=["GET", "POST"])
+def login_view():
+    if request.method == "POST":
+        username = request.form.get("username") or (request.get_json() or {}).get("username")
+        password = request.form.get("password") or (request.get_json() or {}).get("password")
+        user = User.query.filter_by(username=username).first()
+        if user and user.password == password and user.role == 'admin':
+            session['user_id'] = user.user_id
+            session['username'] = user.username
+            if request.is_json:
+                return jsonify({"message": "Login exitoso", "user": user.to_dict()}), 200
+            return redirect(url_for("main.index"))
+        if request.is_json:
+            return jsonify({"error": "Credenciales inv\u00e1lidas"}), 401
+        return render_template("login.html", error="Credenciales inv\u00e1lidas")
+    return render_template("login.html", error=None)
+
+
+@bp.route("/logout")
+def logout_view():
+    session.clear()
+    return redirect(url_for("main.login_view"))
 
 
 def parse_date(val):
