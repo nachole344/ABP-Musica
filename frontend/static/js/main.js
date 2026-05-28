@@ -1,4 +1,6 @@
 let currentArtistIndex = 0;
+let openAlbumIndex = -1;
+let catalogArtistIndex = -1;
 let artistsData = [];
 let productsData = [];
 let eventsData = [];
@@ -76,8 +78,9 @@ async function fetchArtists() {
     try {
         const response = await fetch('/api/artists/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
-        artistsData = await response.json();
+        artistsData = (await response.json()).filter(a => a.albums && a.albums.length > 0);
         renderArtistSlides();
+        initArtistSearch();
     } catch (error) {
         console.warn('Cargando mock data para artistas...');
     }
@@ -140,21 +143,26 @@ async function fetchEvents() {
 }
 
 // RENDER FUNCTIONS
+function toHttps(url) {
+    return url ? url.replace(/^http:\/\//i, 'https://') : '';
+}
+
 function renderArtistSlides() {
     const container = document.getElementById('artists-slides-container');
     if (!container) return;
-    container.innerHTML = artistsData.map((artist, index) => `
+    container.innerHTML = artistsData.map((artist, index) => {
+        const cover = toHttps(artist.albums[Math.floor(Math.random() * artist.albums.length)].cover_album);
+        return `
         <div class="artist-slide ${index === 0 ? 'active' : ''}" id="slide-${index}">
-            <video class="video-bg" autoplay muted loop playsinline>
-                <source src="${artist.video_url || ''}" type="video/mp4">
-            </video>
+            <img class="slide-bg-img" src="${cover}" alt="">
             <div class="artist-info relative z-20">
                 <h2 class="fade-in text-shadow-lg">${artist.artist_name}</h2>
                 <button class="mt-8 px-8 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform shadow-2xl"
                         onclick="viewArtistCatalog(${index})">VER CATÁLOGO</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderProducts(productsToRender = productsData) {
@@ -231,51 +239,57 @@ function viewArtistCatalog(index) {
     const catalogContent = document.getElementById('catalog-content');
     if (!catalogOverlay || !catalogContent || !artist) return;
 
+    catalogArtistIndex = index;
+    openAlbumIndex = -1;
+    artist.albums.sort((a, b) => new Date(b.release_date) - new Date(a.release_date));
+
+    const debutYear  = artist.debut      ? new Date(artist.debut).getFullYear()      : null;
+    const birthYear  = artist.birth_date ? new Date(artist.birth_date).getFullYear() : null;
+    const metaParts  = [artist.country, debutYear ? `Debut ${debutYear}` : null, birthYear ? `Nacido en ${birthYear}` : null].filter(Boolean);
+    const albumCount = (artist.albums || []).length;
+
     catalogContent.innerHTML = `
-        <div class="row pt-10 md:pt-20 pb-20">
-            <div class="col-lg-4 mb-20 sticky-lg-top" style="top: 2rem; height: fit-content;">
-                <h1 class="text-6xl md:text-8xl font-black mb-4 leading-none">${artist.artist_name}</h1>
-                <p class="text-blue-500 font-bold tracking-widest uppercase mb-6">${artist.country} • Debut ${new Date(artist.debut).getFullYear()}</p>
-                <p class="text-slate-400 text-lg leading-relaxed mb-10">${artist.description || 'Sin descripción.'}</p>
-                <a href="${artist.social_media}" target="_blank" class="btn btn-outline-light rounded-pill px-6 py-3 font-bold">REDES SOCIALES</a>
-            </div>
-            <div class="col-lg-7 offset-lg-1">
-                <h3 class="text-2xl font-black mb-10 flex items-center gap-4 tracking-tighter">
-                    <i data-lucide="disc" class="text-blue-500"></i> DISCOGRAFÍA
-                </h3>
-                <div class="space-y-16">
-                    ${(artist.albums || []).map(album => `
-                        <div class="row g-8">
-                            <div class="col-md-4">
-                                <div class="glass-card p-2 rounded-2xl">
-                                    <img src="${album.cover_album}" class="w-full aspect-square object-cover rounded-xl shadow-2xl mb-4" alt="${album.album_title}">
-                                    <h4 class="font-bold text-xl">${album.album_title}</h4>
-                                    <p class="text-slate-500 text-sm mb-3">${new Date(album.release_date).getFullYear()}</p>
-                                    ${album.spotify ? `<a href="${album.spotify}" target="_blank" rel="noopener noreferrer"
-                                        class="inline-flex items-center gap-2 px-4 py-2 bg-[#1DB954] text-black text-sm font-bold rounded-full hover:bg-[#1ed760] transition-colors no-underline">
-                                        <i data-lucide="music" size="14"></i> Spotify
-                                    </a>` : ''}
-                                </div>
-                            </div>
-                            <div class="col-md-8">
-                                <div class="space-y-1">
-                                    ${(album.songs || []).map((song, i) => `
-                                        <a ${song.video_url ? `href="${song.video_url}" target="_blank" rel="noopener noreferrer"` : ''}
-                                           class="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all group no-underline ${song.video_url ? 'cursor-pointer' : 'pointer-events-none'}">
-                                            <div class="flex items-center gap-4">
-                                                <span class="text-slate-600 font-mono text-sm">${String(i + 1).padStart(2, '0')}</span>
-                                                <span class="font-semibold text-slate-200">${song.song_title}</span>
-                                                ${song.video_url ? '<i data-lucide="play-circle" class="text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" size="16"></i>' : ''}
-                                            </div>
-                                            <span class="text-slate-500 font-mono text-xs">${song.duration}</span>
-                                        </a>
-                                    `).join('')}
-                                </div>
-                            </div>
+        <div style="padding-top: 1rem; padding-bottom: 3rem;">
+
+            <!-- HEADER HORIZONTAL -->
+            <div class="catalog-artist-header">
+                <div class="catalog-artist-top">
+                    ${artist.image ? `<img src="${artist.image}" class="catalog-artist-photo" alt="${artist.artist_name}">` : ''}
+                    <div class="catalog-artist-info">
+                        <h1 class="text-5xl md:text-7xl font-black leading-none mb-1">${artist.artist_name}</h1>
+                        ${artist.real_name ? `<p class="text-slate-500 font-semibold text-sm mb-3">${artist.real_name}</p>` : ''}
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;">
+                            <p class="text-blue-400 font-bold tracking-widest uppercase text-xs m-0">${metaParts.join(' · ')}</p>
+                            ${artist.social_media ? `
+                            <a href="${artist.social_media}" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-3 py-1 border border-white/20 rounded-full text-xs font-bold hover:bg-white/10 transition-colors no-underline text-white flex-shrink-0">
+                                <i data-lucide="share-2" size="12"></i> Redes
+                            </a>` : ''}
                         </div>
-                    `).join('')}
+                    </div>
                 </div>
+                ${artist.description ? `<p class="catalog-artist-bio">${artist.description}</p>` : ''}
             </div>
+
+            <!-- DISCOGRAFÍA -->
+            <h3 class="text-base font-black mb-4 tracking-tight flex items-center gap-2 uppercase">
+                <i data-lucide="disc-3" class="text-blue-500" size="18"></i>
+                Discografía
+                <span class="text-slate-600 font-normal text-xs normal-case">${albumCount} álbum${albumCount !== 1 ? 'es' : ''}</span>
+            </h3>
+
+            <div class="discography-grid">
+                ${(artist.albums || []).map((album, ai) => `
+                    <div class="album-card" onclick="openAlbumModal(${ai})">
+                        <img src="${album.cover_album}" alt="${album.album_title}" loading="lazy">
+                        <div class="album-card-body">
+                            <p class="font-bold text-sm leading-tight mb-0.5">${album.album_title}</p>
+                            <p class="text-slate-500 text-xs">${new Date(album.release_date).getFullYear()} · ${album.total_track} canciones</p>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+
         </div>
     `;
 
@@ -284,7 +298,53 @@ function viewArtistCatalog(index) {
     if (window.lucide) lucide.createIcons();
 }
 
+function openAlbumModal(albumIndex) {
+    const artist = artistsData[catalogArtistIndex];
+    if (!artist) return;
+    const album   = artist.albums[albumIndex];
+    const overlay = document.getElementById('album-modal-overlay');
+    const header  = document.getElementById('album-modal-header');
+    const list    = document.getElementById('album-modal-tracklist');
+
+    header.innerHTML = `
+        <img src="${album.cover_album}" class="modal-cover" alt="${album.album_title}">
+        <div style="flex:1;min-width:0;">
+            <h4 class="font-black text-xl leading-tight mb-1">${album.album_title}</h4>
+            <p class="text-slate-500 text-xs mb-3">
+                ${new Date(album.release_date).toLocaleDateString('es-ES', { year:'numeric', month:'long' })} · ${album.total_track} canciones
+            </p>
+            ${album.spotify ? `
+            <a href="${album.spotify}" target="_blank" rel="noopener noreferrer"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-[#1DB954] text-black text-xs font-black rounded-full hover:bg-[#1ed760] transition-colors no-underline">
+                <i data-lucide="music" size="13"></i> Abrir en Spotify
+            </a>` : ''}
+        </div>
+        <button class="modal-close" onclick="closeAlbumModal()">
+            <i data-lucide="x" size="14"></i>
+        </button>
+    `;
+
+    list.innerHTML = (album.songs || []).map((song, i) => `
+        <a ${song.video_url ? `href="${song.video_url}" target="_blank" rel="noopener noreferrer"` : ''}
+           class="tracklist-row ${song.video_url ? '' : 'pointer-events-none'}">
+            <span class="text-slate-600 font-mono text-xs w-5 text-right flex-shrink-0">${String(i + 1).padStart(2, '0')}</span>
+            <span class="flex-1 font-semibold text-sm text-slate-200 truncate">${song.song_title}</span>
+            ${song.video_url ? `<i data-lucide="play-circle" class="text-blue-400 flex-shrink-0" size="14"></i>` : ''}
+            <span class="text-slate-500 font-mono text-xs flex-shrink-0">${song.duration ? song.duration.slice(3) : ''}</span>
+        </a>
+    `).join('');
+
+    overlay.classList.add('open');
+    if (window.lucide) lucide.createIcons();
+}
+
+function closeAlbumModal(e) {
+    if (e && e.target !== document.getElementById('album-modal-overlay')) return;
+    document.getElementById('album-modal-overlay').classList.remove('open');
+}
+
 function closeCatalog() {
+    document.getElementById('album-modal-overlay')?.classList.remove('open');
     const catalogOverlay = document.getElementById('catalog-overlay');
     if (catalogOverlay) {
         catalogOverlay.classList.remove('active');
@@ -301,6 +361,87 @@ function updateSlide(newIndex) {
     currentArtistIndex = newIndex;
     const nextSlide = document.getElementById(`slide-${currentArtistIndex}`);
     if (nextSlide) nextSlide.classList.add('active');
+}
+
+function initArtistSearch() {
+    const input = document.getElementById('artists-search-input');
+    const dropdown = document.getElementById('artist-search-dropdown');
+    if (!input || !dropdown) return;
+
+    let focusedIndex = -1;
+
+    function getMatches(q) {
+        return artistsData
+            .map((a, i) => ({ name: a.artist_name, index: i }))
+            .filter(a => a.name.toLowerCase().includes(q.toLowerCase()))
+            .slice(0, 8);
+    }
+
+    function renderDropdown(matches) {
+        dropdown.innerHTML = matches.map((a, i) => `
+            <div class="artist-dropdown-item" data-index="${a.index}" role="option" tabindex="-1">${a.name}</div>
+        `).join('');
+        dropdown.querySelectorAll('.artist-dropdown-item').forEach(el => {
+            el.addEventListener('mousedown', e => {
+                e.preventDefault();
+                selectArtist(parseInt(el.dataset.index));
+            });
+        });
+    }
+
+    function setFocus(i) {
+        const items = dropdown.querySelectorAll('.artist-dropdown-item');
+        items.forEach(el => el.classList.remove('focused'));
+        focusedIndex = Math.max(-1, Math.min(i, items.length - 1));
+        if (focusedIndex >= 0) items[focusedIndex].classList.add('focused');
+    }
+
+    function openDropdown(q) {
+        const matches = getMatches(q);
+        if (matches.length === 0) { closeDropdown(); return; }
+        renderDropdown(matches);
+        focusedIndex = -1;
+        dropdown.classList.add('open');
+        input.setAttribute('aria-expanded', 'true');
+    }
+
+    function closeDropdown() {
+        dropdown.classList.remove('open');
+        input.setAttribute('aria-expanded', 'false');
+        focusedIndex = -1;
+    }
+
+    function selectArtist(artistIndex) {
+        updateSlide(artistIndex);
+        input.value = '';
+        closeDropdown();
+        input.blur();
+    }
+
+    input.addEventListener('input', () => {
+        const q = input.value.trim();
+        if (q === '') { closeDropdown(); return; }
+        openDropdown(q);
+    });
+
+    input.addEventListener('keydown', e => {
+        const items = dropdown.querySelectorAll('.artist-dropdown-item');
+        if (!dropdown.classList.contains('open')) return;
+        if (e.key === 'ArrowDown' || (e.key === 'Tab' && !e.shiftKey)) {
+            e.preventDefault();
+            setFocus(focusedIndex + 1 < items.length ? focusedIndex + 1 : 0);
+        } else if (e.key === 'ArrowUp' || (e.key === 'Tab' && e.shiftKey)) {
+            e.preventDefault();
+            setFocus(focusedIndex - 1 >= 0 ? focusedIndex - 1 : items.length - 1);
+        } else if (e.key === 'Enter' && focusedIndex >= 0) {
+            e.preventDefault();
+            selectArtist(parseInt(items[focusedIndex].dataset.index));
+        } else if (e.key === 'Escape') {
+            closeDropdown();
+        }
+    });
+
+    input.addEventListener('blur', () => setTimeout(closeDropdown, 150));
 }
 
 // CARRITO
