@@ -480,6 +480,7 @@ function updateSlide(newIndex) {
     if (nextSlide) nextSlide.classList.add('active');
 }
 
+
 function initArtistSearch() {
     const input = document.getElementById('artists-search-input');
     const dropdown = document.getElementById('artist-search-dropdown');

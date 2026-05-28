@@ -683,6 +683,7 @@
         .spotify-section { display:flex; flex-direction:column; gap:1rem; }
         .spotify-lbl { font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.3rem; }
 
+
         @media(max-width:640px) {
             .catalog-artist-header { flex-direction: column; }
             .catalog-artist-photo { width: 90px; height: 90px; }
@@ -794,9 +795,7 @@
                 <button class="nav-arrow arrow-left" onclick="prevArtist()"><i data-lucide="chevron-left"></i></button>
                 <button class="nav-arrow arrow-right" onclick="nextArtist()"><i data-lucide="chevron-right"></i></button>
 
-                <div id="artists-slides-container">
-                    <!-- Los artistas se inyectarán aquí -->
-                </div>
+                <div id="artists-slides-container"></div>
 
                 <!-- Panel inferior: buscador -->
                 <div id="artists-bottom">
@@ -979,6 +978,6 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="static/js/main.js?v=7"></script>
+    <script src="static/js/main.js?v=10"></script>
 </body>
 </html>
