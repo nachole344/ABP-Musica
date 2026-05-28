@@ -1,0 +1,29 @@
+@startuml
+actor Usuario
+participant "Frontend\n(main.js / HTML)" as UI
+participant "Backend\n(Flask API)" as API
+database "Base de Datos\n(PostgreSQL)" as DB
+
+== Carga inicial de la tienda ==
+Usuario -> UI: Selecciona la vista de Eventos
+UI -> API: GET /api/events/
+activate API
+API -> DB: SELECT * FROM events
+activate DB
+DB --> API: Retorna registros de eventos
+deactivate DB
+API --> UI: Retorna JSON con todos los eventos
+deactivate API
+UI --> Usuario: Renderiza la cuadrícula de eventos
+
+== Reserva de entradas ==
+Usuario -> UI: Clic en "Reservar"
+activate UI
+UI -> UI: Busca ID en 'eventData'
+UI -> Usuario: Pide confirmacion de la reserva
+Usuario --> UI: Acepta confirmación
+UI -> UI: alert("Reserva confirmada")
+UI --> Usuario: Bloquea la reserva de entradas para ese evento
+deactivate UI
+
+@enduml

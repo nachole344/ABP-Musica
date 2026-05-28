@@ -1,0 +1,35 @@
+@startuml
+actor Usuario
+participant "Frontend\n(main.js / HTML)" as UI
+participant "Backend\n(Flask API)" as API
+database "Base de Datos\n(PostgreSQL)" as DB
+
+== Carga inicial del catalogo ==
+Usuario -> UI: Selecciona la vista de Artistas
+UI -> API: GET /api/artists/
+activate API
+API -> DB: SELECT * FROM artists
+activate DB
+DB --> API: Retorna registros de artisras
+deactivate DB
+API --> UI: Retorna JSON con todos los artistas
+deactivate API
+UI --> Usuario: Renderiza un carrusel con los artistas
+UI --> UI: Guerda los registros de los albumes y canciones para uso posterior.
+
+== Interacción con el artista ==
+Usuario -> UI: Pulsa en "Ver Catálogo"
+activate UI
+UI -> UI: Busca los datos del artista en los registros guardados
+UI --> Usuario: Muestra los datos y álbumes del artista
+Usuario -> UI: Pulsa en un album
+UI --> Usuario: Despliega la lista de canciones del álbum
+Usuario -> UI: Pulsa en una canción
+UI --> Usuario: Redirige al usuario al videoclip de la cancián seleccionada
+Usuario -> UI: Pulsa en "Abrir en Sptify"
+UI --> Usuario: Redirige al usuario a la página del album en Spotify
+Usuario -> UI: Pulsa en "Redes"
+UI --> Usuario: Redirige al usuario a las redes sociales del artista
+deactivate UI
+
+@enduml

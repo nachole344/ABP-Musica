@@ -1,0 +1,31 @@
+@startuml
+
+start
+:Acceder a la sección "Artistas";
+:Cargar productos (fetchArtists);
+:Renderizar todos los artistas;
+
+if (¿Ver detalles del artista?) then (sí)
+    :Hacer clic en "VER CATÁLOGO" (viewArtistCatalog);
+    :Muestra los detalles del artista (descripcion, albumes, canciones...);
+    if (¿Hace clic en el boton de redes?) then (sí)
+        :Redirige al usuario a las redes sociales del artista;
+    else (no)
+        if (¿Hace clic en un album?) then (sí)
+            :Despliega una ventana con las canciones del album;
+            if (¿Hace clic en una canción?) then (si)
+                :Redirige al usuario al videoclip de la canción;
+            else (no)
+                if (¿Hace clic en el botón de Spotify?) then (sí)
+                    :Redirige al usuario a la pagina de Spotify del album;
+                else (no)
+                endif
+            endif
+        else (no)
+        endif
+    endif
+else (no)
+endif
+stop
+
+@enduml

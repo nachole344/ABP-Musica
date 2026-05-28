@@ -1,0 +1,132 @@
+@startuml
+' --- CONFIGURACIÓN VISUAL ---
+
+skinparam linetype ortho
+skinparam nodesep 50
+skinparam ranksep 50
+
+' --- ENTIDADES ---
+package "ABP-Musica" {
+  package "backend" {
+    enum product_type_enum {
+      album
+      vinyl
+      clothing
+      tote_bag
+      pin
+    }
+
+    enum event_type_enum {
+      concert
+      tour
+      festival
+      movie
+      tv_series
+    }
+
+    enum order_status_enum {
+      pending
+      paid
+      shipped
+      delivered
+      cancelled
+    }
+    entity "artists" as artists {
+      * artist_id : INT <<PK>>
+      --
+      * real_name : VARCHAR(150)
+      * artist_name : VARCHAR(150)
+      * birth_date : DATE
+      * debut : DATE
+      * country : VARCHAR(150)
+      * social_media : TEXT
+      * image : TEXT
+      o description : TEXT
+      * mb_id : UUID
+    }
+
+    entity "albums" as albums {
+      * album_id : INT <<PK>>
+      --
+      o artist_id : INT <<FK>>
+      * album_title : VARCHAR(100)
+      * release_date : DATE
+      * total_track : INT
+      * cover_album : TEXT
+      * spotify : TEXT
+      * mb_album_id : UUID
+    }
+
+    entity "songs" as songs {
+      * song_id : INT <<PK>>
+      --
+      o album_id : INT <<FK>>
+      * song_title : VARCHAR(150)
+      * duration : TIME
+      o video_url : TEXT
+      * cover_song : TEXT
+      * mb_song_id : UUID
+    }
+
+    entity "products" as products {
+      * product_id : INT <<PK>>
+      --
+      o artist_id : INT <<FK>>
+      * product_name : VARCHAR(250)
+      * product_type : product_type_enum
+      * price : DECIMAL(10,2)
+      * stock : INT
+      * image_url : TEXT
+    }
+
+    entity "events" as events {
+      * event_id : INT <<PK>>
+      --
+      o artist_id : INT <<FK>>
+      * event_name : VARCHAR(250)
+      * event_type : event_type_enum
+      * event_date : DATE
+      o location : VARCHAR(100)
+      * poster : TEXT
+    }
+
+    entity "carts" as carts {
+      * cart_id : INT <<PK>>
+      --
+      o product_id : INT <<FK>>
+      * quantity : INT
+    }
+
+    entity "orders" as orders {
+      * order_id : INT <<PK>>
+      --
+      * order_date : DATE
+      * total_price : DECIMAL(10,2)
+      * status : order_status_enum
+    }
+
+    entity "order_items" as order_items {
+      * order_item_id : INT <<PK>>
+      --
+      o order_id : INT <<FK>>
+      o product_id : INT <<FK>>
+      * quantity : INT
+      * price : DECIMAL(10,2)
+    }
+
+    entity "users" as users {
+      * user_id : INT <<PK>>
+      --
+      * username : VARCHAR(50)
+      * password : VARCHAR(50)
+      * date : TIMESTAMP
+    }
+
+  }
+
+  package "frontend" {
+    
+  }
+}
+
+@enduml

@@ -6,6 +6,10 @@ let ordersData = [];
 let orderItemsData = [];
 let cart = []; // Array para guardar los preductos que se desean comprar
 
+// Variables de los filtros en la tienda
+let activeCategory = 'all';
+let activeArtist = 'all';
+
 // MOCK DATA temporal para provar el funcionamiento de los productos
 const mockProducts = [
     {
@@ -245,10 +249,11 @@ function toggleMobileMenu() {
 // LÓGICA DE ARTISTAS (Carousel Full-Screen)
 async function fetchArtists() {
     try {
-        const response = await fetch('http://fuertes:5000/api/artists/', { credentials: 'include' });
+        const response = await fetch('https://musehub.mom/api/artists/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
         artistsData = await response.json();
         renderArtistSlides();
+        populateArtistFilter();
     } catch (error) {
         console.warn('Cargando mock data para artistas...');
     }
@@ -256,7 +261,7 @@ async function fetchArtists() {
 
 async function fetchProducts() {
     try {
-        const response = await fetch('http://fuertes:5000/api/shop/', { credentials: 'include' });
+        const response = await fetch('https://musehub.mom/api/shop/', { credentials: 'include' });
 
         // Si el backend responde pero devuelve un array vacío (la BD no tiene datos aún)
         const data = await response.json();
@@ -268,19 +273,19 @@ async function fetchProducts() {
             productsData = data;
         }
 
-        renderProducts(productsData);
+        renderProducts();
 
     } catch (error) {
         // Si el backend ni siquiera está encendido, caemos aquí
         console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
         productsData = mockProducts;
-        renderProducts(productsData);
+        renderProducts();
     }
 }
 
 async function fetchOrders() {
     try {
-        const response = await fetch('http://fuertes:5000/api/orders/', { credentials: 'include' });
+        const response = await fetch('https://musehub.mom/api/orders/', { credentials: 'include' });
         const data = await response.json();
 
         if (data.length === 0) {
@@ -302,7 +307,7 @@ async function fetchOrders() {
 
 async function fetchOrdersItems() {
     try {
-        const response = await fetch('http://fuertes:5000/api/order_items/', { credentials: 'include' });
+        const response = await fetch('https://musehub.mom/api/orders/items/', { credentials: 'include' });
         const data = await response.json();
 
         if (data.length === 0) {
@@ -313,18 +318,20 @@ async function fetchOrdersItems() {
         }
 
         renderOrders();
+        renderFeaturedProducts();
 
     } catch (error) {
         // Si el backend ni siquiera está encendido, caemos aquí
         console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
         orderItemsData = mockOrderItems;
         renderOrders();
+        renderFeaturedProducts();
     }
 }
 
 async function fetchEvents() {
     try {
-        const response = await fetch('http://fuertes:5000/api/events/', { credentials: 'include' });
+        const response = await fetch('https://musehub.mom/api/events/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
         eventsData = mockEvents;
         renderEvents();
@@ -464,70 +471,164 @@ function updateSlide(newIndex) {
     if (nextSlide) nextSlide.classList.add('active');
 }
 
-
-//////////////////////////
-// EXTRAS: ///////////////
-// - conciertos //////////
-// - tours ///////////////
-// - festivales //////////
-// - eventos /////////////
-// - series tv/pelis /////
-// - empresas musicales //
-//////////////////////////
-
-// Mostrar Conciertos
-
-// Mostrar ...
-
-// Poner Reservas
 // LÓGICA SHOP
 
 // Por defecto, usa todos los productos (productsData).
 function renderProducts(productsToRender = productsData) {
     const container = document.getElementById('shop-container');
     if (!container) return;
-
-    // Si no hay productos que mostrar, se enseña un mensaje avisando de ello.
     if (productsToRender.length === 0) {
         container.innerHTML = `<p class="text-slate-400 col-span-full text-center py-10">No hay productos disponibles en esta categoría.</p>`;
         return;
     }
-
-    // Se introduce todos los productos en el HTML
-    container.innerHTML = productsToRender.map(product => `
+    container.innerHTML = productsToRender.map(product => {
+        const inStock = product.stock === undefined || product.stock > 0;
+        const stockBadge = product.stock !== undefined
+            ? `<span class="text-xs font-semibold ${inStock ? 'text-emerald-400' : 'text-red-400'}">${inStock ? `Stock: ${product.stock}` : 'Sin stock'}</span>`
+            : '';
+        return `
         <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group flex flex-col justify-between">
             <div>
                 <img src="${product.image_url}" class="w-full aspect-square object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" alt="${product.product_name}">
                 <h3 class="font-bold text-lg leading-tight mb-1">${product.product_name}</h3>
-                <p class="text-slate-400 text-xs font-semibold tracking-widest mb-4 uppercase">${product.product_type.replace('_', ' ')}</p>
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-slate-400 text-xs font-semibold tracking-widest uppercase">${product.product_type.replace('_', ' ')}</p>
+                    ${stockBadge}
+                </div>
             </div>
             <div class="flex items-center justify-between mt-4 gap-2">
                 <span class="text-xl font-black">${product.price.toFixed(2)}€</span>
-                
                 <div class="flex items-center gap-1.5">
-                    <input type="number" id="qty-${product.product_id}" value="1" min="1" 
-                           class="w-12 p-1.5 bg-white/10 text-white rounded-lg text-center text-sm font-bold border border-white/10 focus:outline-none focus:border-red-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                    
-                    <button class="p-2 bg-red-500 rounded-lg hover:bg-red-600 transition-colors" onclick="addToCart(${product.product_id})">
+                    <input type="number" id="qty-${product.product_id}" value="1" min="1" max="${product.stock || 99}"
+                           ${!inStock ? 'disabled' : ''}
+                           class="w-12 p-1.5 bg-white/10 text-white rounded-lg text-center text-sm font-bold border border-white/10 focus:outline-none focus:border-red-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-40">
+                    <button class="p-2 rounded-lg transition-colors ${inStock ? 'bg-red-500 hover:bg-red-600' : 'bg-slate-600 cursor-not-allowed opacity-50'}"
+                            onclick="${inStock ? `addToCart(${product.product_id})` : ''}" ${!inStock ? 'disabled' : ''}>
                         <i data-lucide="shopping-cart" size="20"></i>
                     </button>
                 </div>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 
-    // Se recargan los iconos de Lucide para evitar errores.
     if (window.lucide) lucide.createIcons();
 }
 
-// Filtra los productos comparando el parámetro con el product_type
-function filterProducts(type) {
-    if (type === 'all') {
-        renderProducts(productsData); // Muestra todos
-    } else {
-        const filtered = productsData.filter(p => p.product_type === type);
-        renderProducts(filtered); // Muestra solo los de la categoría
+function renderFeaturedProducts() {
+    const container = document.getElementById('featured-products-container');
+
+    // Solo procedemos si existen ambos arrays de datos y el contenedor HTML
+    if (!container || productsData.length === 0 || orderItemsData.length === 0) return;
+
+    const salesCount = {};
+    orderItemsData.forEach(item => {
+        salesCount[item.product_id] = (salesCount[item.product_id] || 0) + item.quantity;
+    });
+
+    const topProducts = Object.keys(salesCount)
+        .map(id => {
+            const product = productsData.find(p => p.product_id === parseInt(id));
+            return product ? { ...product, total_sold: salesCount[id] } : null;
+        })
+        .filter(p => p !== null)
+        .sort((a, b) => b.total_sold - a.total_sold)
+        .slice(0, 4); // Seleccionamos solo los 4 primeros
+
+    if (topProducts.length === 0) {
+        container.innerHTML = `<p class="text-slate-400">Aún no hay suficientes datos de ventas.</p>`;
+        return;
     }
+
+    container.innerHTML = topProducts.map(product => {
+        const inStock = product.stock === undefined || product.stock > 0;
+        const stockBadge = product.stock !== undefined
+            ? `<span class="text-xs font-semibold ${inStock ? 'text-emerald-400' : 'text-red-400'}">${inStock ? `Stock: ${product.stock}` : 'Sin stock'}</span>`
+            : '';
+        return `
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 hover:bg-white/10 transition-all group flex flex-col justify-between">
+            <div>
+                <img src="${product.image_url}" class="w-full aspect-square object-cover rounded-xl mb-4 group-hover:scale-105 transition-transform" alt="${product.product_name}">
+                <h3 class="font-bold text-lg leading-tight mb-1">${product.product_name}</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <p class="text-slate-400 text-xs font-semibold tracking-widest uppercase">${product.product_type.replace('_', ' ')}</p>
+                    ${stockBadge}
+                </div>
+            </div>
+            <div class="flex items-center justify-between mt-4 gap-2">
+                <span class="text-xl font-black">${product.price.toFixed(2)}€</span>
+                <div class="flex items-center gap-1.5">
+                    <input type="number" id="qty-${product.product_id}" value="1" min="1" max="${product.stock || 99}"
+                           ${!inStock ? 'disabled' : ''}
+                           class="w-12 p-1.5 bg-white/10 text-white rounded-lg text-center text-sm font-bold border border-white/10 focus:outline-none focus:border-red-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-40">
+                    <button class="p-2 rounded-lg transition-colors ${inStock ? 'bg-red-500 hover:bg-red-600' : 'bg-slate-600 cursor-not-allowed opacity-50'}"
+                            onclick="${inStock ? `addToCart(${product.product_id})` : ''}" ${!inStock ? 'disabled' : ''}>
+                        <i data-lucide="shopping-cart" size="20"></i>
+                    </button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+
+    if (window.lucide) lucide.createIcons();
+}
+
+// Se ejecuta al pulsar los botones de categoría
+function filterProducts(type) {
+    activeCategory = type;
+    applyFilters();
+}
+
+// Se ejecuta al cambiar la selección en el menú desplegable de artistas
+function filterByArtist(artistId) {
+    activeArtist = artistId;
+    applyFilters();
+}
+
+// Cruza ambas variables y renderiza el resultado exacto
+function applyFilters() {
+    let filteredResults = productsData;
+
+    if (activeCategory !== 'all') {
+        filteredResults = filteredResults.filter(product => product.product_type === activeCategory);
+    }
+
+    if (activeArtist !== 'all') {
+        filteredResults = filteredResults.filter(product => product.artist_id === parseInt(activeArtist));
+    }
+
+    // Ocultar los productos destacados si hay filtros
+    const featuredSection = document.getElementById('featured-section');
+    const productsTitle = document.getElementById('all-products-title');
+    if (featuredSection) {
+        if (activeCategory !== 'all' || activeArtist !== 'all') {
+            featuredSection.classList.add('hidden');
+            productsTitle.classList.add('hidden');
+        } else {
+            featuredSection.classList.remove('hidden');
+            productsTitle.classList.remove('hidden');
+        }
+    }
+
+    renderProducts(filteredResults);
+}
+
+// Inyecta los artistas dentro del elemento <select> del HTML
+function populateArtistFilter() {
+    const selectElement = document.getElementById('artist-filter');
+    if (!selectElement) return;
+
+    // Reiniciamos el select manteniendo siempre la opción inicial de "Todos"
+    selectElement.innerHTML = `<option value="all" class="bg-zinc-950 text-white">Todos los Artistas</option>`;
+
+    // Recorremos los artistas guardados y los añadimos como opciones
+    artistsData.forEach(artist => {
+        selectElement.innerHTML += `
+            <option value="${artist.artist_id}" class="bg-zinc-950 text-white">
+                ${artist.artist_name}
+            </option>
+        `;
+    });
 }
 
 // LÓGICA CARRITO
@@ -561,11 +662,17 @@ function closeCart() {
 
 function addToCart(productId) {
     const product = productsData.find(p => p.product_id === productId);
+    const productStock = product.stock;
     if (!product) return;
 
     // Se revisa la cantidad que se quiere añadir
     const qtyInput = document.getElementById(`qty-${productId}`);
     const quantityToAdd = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
+    if (quantityToAdd > productStock) {
+        alert("La cantidad que se quiere añadir, supera a la cantidad de stock");
+        return;
+    }
 
     const existingItem = cart.find(item => item.product_id === productId);
 
@@ -683,7 +790,7 @@ function showPrviousOrders() {
 
     // Muestra el modal con una transición suave (Fade in y zoom)
     modalOverlay.classList.remove('hidden');
-    
+
     // Un pequeño delay para que la transición CSS tenga efecto
     setTimeout(() => {
         modalOverlay.classList.remove('opacity-0');
@@ -692,7 +799,7 @@ function showPrviousOrders() {
 
     // Cerramos el carrito lateral por si estaba abierto
     closeCart();
-    
+
     // Renderizamos los pedidos
     renderOrders();
 }
@@ -704,7 +811,7 @@ function closeOrdersModal() {
     // Oculta el modal con animación inversa
     modalOverlay.classList.add('opacity-0');
     modalContent.classList.add('scale-95');
-    
+
     setTimeout(() => {
         modalOverlay.classList.add('hidden');
     }, 300);
@@ -722,18 +829,18 @@ function renderOrders() {
 
     // Iteramos sobre todos los pedidos (del más reciente al más antiguo, por lo que le damos la vuelta con reverse())
     container.innerHTML = [...ordersData].reverse().map(order => {
-        
+
         // Se buscan los productos que pertenezcan al pedido
         const orderItems = orderItemsData.filter(item => item.order_id === order.order_id);
-        
+
         // Se inserta el HTML de cada pedido
         const itemsHtml = orderItems.map(item => {
             // Buscamos la info visual del producto usando el product_id
             const productInfo = productsData.find(p => p.product_id === item.product_id);
-            
+
             // Si por alguna razón no encuentra el producto, saltamos (para no romper la app)
-            if (!productInfo) return ''; 
-            
+            if (!productInfo) return '';
+
             return `
                 <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
                     <div class="flex items-center gap-4">
@@ -751,7 +858,7 @@ function renderOrders() {
         // Cambia el color según el estado del pedido
         let statusClasses = "bg-slate-500/20 text-slate-400"; // Por defecto
         let statusLabel = "Desconocido";
-        
+
         if (order.status === "delivered") {
             statusClasses = "bg-emerald-500/20 text-emerald-400";
             statusLabel = "Entregado";
@@ -839,7 +946,7 @@ async function handleLogin(event) {
 
 async function handleLogout() {
     try {
-        const response = await fetch('http://fuertes:5000/api/auth/logout', { 
+        const response = await fetch('https://musehub.mom/api/auth/logout', {
             method: 'POST',
             credentials: 'include'
         });
@@ -853,7 +960,7 @@ async function handleLogout() {
 
 async function checkLoginStatus() {
     try {
-        const response = await fetch('http://fuertes:5000/api/auth/check', {
+        const response = await fetch('https://musehub.mom/api/auth/check', {
             credentials: 'include'
         });
         const data = await response.json();
@@ -876,7 +983,7 @@ function updateUIForLoggedInUser(user) {
     if (loginLabel) loginLabel.innerText = user.username;
     if (loginBtn) loginBtn.classList.add('active');
     if (logoutBtn) logoutBtn.classList.remove('hidden');
-    
+
     // Por ahora, asumimos que si puede loguearse es admin para mostrar el botón
     // pero lo hacemos condicional por si luego quieres añadir roles.
     if (adminBtn) adminBtn.classList.remove('hidden');

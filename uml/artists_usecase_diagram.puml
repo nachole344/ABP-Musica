@@ -1,0 +1,28 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Usuario" as U
+actor "Admin" as A
+
+package "Artists" {
+  ' Usos del Usuario '
+  usecase "Ver los artistas disponibles" as UC1
+  usecase "Revisar albumes y canciones del artista" as UC2
+  usecase "Visitar las redes sociales del artista" as UC3
+
+  ' Usos del Administrador '
+  usecase "Añadir artistas" as UC4
+  usecase "Eliminar artistas" as UC5
+  usecase "Editar artistas" as UC6
+}
+
+U --> UC1
+U --> UC2
+U --> UC3
+
+A --> UC4
+A --> UC5
+A --> UC6
+
+@enduml
