@@ -42,7 +42,24 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchEvents();
     fetchOrders();
     checkLoginStatus();
+    initSwipe();
 });
+
+function initSwipe() {
+    const section = document.getElementById('artists-section');
+    if (!section) return;
+    let startX = 0, startY = 0;
+    section.addEventListener('touchstart', e => {
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+    }, { passive: true });
+    section.addEventListener('touchend', e => {
+        const dx = e.changedTouches[0].clientX - startX;
+        const dy = e.changedTouches[0].clientY - startY;
+        if (Math.abs(dx) < 40 || Math.abs(dy) > Math.abs(dx)) return;
+        if (dx < 0) nextArtist(); else prevArtist();
+    }, { passive: true });
+}
 
 // NAVEGACIÓN GLOBAL
 function showSection(sectionId) {
@@ -154,11 +171,21 @@ function renderArtistSlides() {
         const cover = toHttps(artist.albums[Math.floor(Math.random() * artist.albums.length)].cover_album);
         return `
         <div class="artist-slide ${index === 0 ? 'active' : ''}" id="slide-${index}">
-            <img class="slide-bg-img" src="${cover}" alt="">
-            <div class="artist-info relative z-20">
-                <h2 class="fade-in text-shadow-lg">${artist.artist_name}</h2>
-                <button class="mt-8 px-8 py-3 bg-white text-black font-bold rounded-full hover:scale-105 transition-transform shadow-2xl"
-                        onclick="viewArtistCatalog(${index})">VER CATÁLOGO</button>
+            <div class="vinyl-scene">
+                <div class="vinyl-glow" style="background-image: url('${cover}')"></div>
+                <div class="vinyl-ring"></div>
+                <div class="vinyl-ring vinyl-ring-2"></div>
+                <div class="vinyl-ring vinyl-ring-3"></div>
+                <div class="vinyl-disc">
+                    <div class="vinyl-label">
+                        <img src="${cover}" alt="${artist.artist_name}">
+                    </div>
+                    <div class="vinyl-hole"></div>
+                </div>
+                <div class="vinyl-text-overlay">
+                    <p class="vinyl-artist-name">${artist.artist_name}</p>
+                    <button class="vinyl-catalog-btn" onclick="viewArtistCatalog(${index})">VER CATÁLOGO</button>
+                </div>
             </div>
         </div>
         `;
@@ -544,8 +571,14 @@ async function goToOrders() {
 }
 
 function updateCartCounter() {
+    const total = cart.reduce((sum, item) => sum + item.quantity, 0);
     const counter = document.getElementById('cart-count');
-    if (counter) counter.innerText = cart.reduce((sum, item) => sum + item.quantity, 0);
+    if (counter) counter.innerText = total;
+    const mobileCounter = document.getElementById('mobile-cart-count');
+    if (mobileCounter) {
+        mobileCounter.innerText = total;
+        mobileCounter.style.display = total > 0 ? 'flex' : 'none';
+    }
 }
 
 function removeFromCart(productId) {
@@ -721,6 +754,7 @@ async function checkLoginStatus() {
 }
 
 function updateUIForLoggedInUser(user) {
+    // Sidebar escritorio
     const adminBtn = document.getElementById('nav-admin-panel');
     const loginBtn = document.getElementById('nav-login');
     const logoutBtn = document.getElementById('nav-logout');
@@ -728,10 +762,20 @@ function updateUIForLoggedInUser(user) {
     if (loginLabel) loginLabel.innerText = user.username;
     if (loginBtn) loginBtn.classList.add('active');
     if (logoutBtn) logoutBtn.classList.remove('hidden');
-    // Only show admin panel button for admin users
     if (adminBtn) {
         if (user.role === 'admin') adminBtn.classList.remove('hidden');
         else adminBtn.classList.add('hidden');
+    }
+    // Menú móvil
+    const mobileAdmin  = document.getElementById('mobile-nav-admin');
+    const mobileLogin  = document.getElementById('mobile-nav-login');
+    const mobileLogout = document.getElementById('mobile-nav-logout');
+    const mobileLabel  = document.getElementById('mobile-login-label');
+    if (mobileLabel)  mobileLabel.innerText = user.username;
+    if (mobileLogout) { mobileLogout.classList.remove('hidden'); mobileLogout.style.display = 'block'; }
+    if (mobileAdmin) {
+        if (user.role === 'admin') { mobileAdmin.classList.remove('hidden'); mobileAdmin.style.display = 'block'; }
+        else { mobileAdmin.classList.add('hidden'); mobileAdmin.style.display = ''; }
     }
 }
 
@@ -763,6 +807,7 @@ async function handleRegister(event) {
 }
 
 function updateUIForLoggedOutUser() {
+    // Sidebar escritorio
     const adminBtn = document.getElementById('nav-admin-panel');
     const loginBtn = document.getElementById('nav-login');
     const logoutBtn = document.getElementById('nav-logout');
@@ -771,4 +816,11 @@ function updateUIForLoggedOutUser() {
     if (loginBtn) loginBtn.classList.remove('active');
     if (logoutBtn) logoutBtn.classList.add('hidden');
     if (adminBtn) adminBtn.classList.add('hidden');
+    // Menú móvil
+    const mobileAdmin  = document.getElementById('mobile-nav-admin');
+    const mobileLogout = document.getElementById('mobile-nav-logout');
+    const mobileLabel  = document.getElementById('mobile-login-label');
+    if (mobileLabel)  mobileLabel.innerText = 'Iniciar Sesión';
+    if (mobileLogout) { mobileLogout.classList.add('hidden'); mobileLogout.style.display = ''; }
+    if (mobileAdmin)  { mobileAdmin.classList.add('hidden');  mobileAdmin.style.display = ''; }
 }

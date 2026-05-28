@@ -241,33 +241,214 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            text-align: center;
+            background: radial-gradient(ellipse at 50% 50%, #0d0d0d 0%, #050505 70%);
         }
         .artist-slide.active { opacity: 1; z-index: 10; }
-        
-        .slide-bg-img {
+
+        /* Escena: disco + texto superpuesto */
+        .vinyl-scene {
+            position: relative;
+            width: min(80vh, 80vw);
+            height: min(80vh, 80vw);
+            flex-shrink: 0;
+        }
+
+        /* Anillos ambientales que emanan del disco */
+        .vinyl-scene::before {
+            content: '';
+            position: absolute;
+            inset: -6%;
+            border-radius: 50%;
+            box-shadow:
+                0 0 0 14px rgba(255,255,255,0.018),
+                0 0 0 32px rgba(255,255,255,0.012),
+                0 0 0 58px rgba(255,255,255,0.007),
+                0 0 90px 10px rgba(255,255,255,0.035);
+            pointer-events: none;
+        }
+
+        /* Aura de color — portada desenfocada como fondo ambiental */
+        .vinyl-glow {
+            position: absolute;
+            inset: -20%;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            filter: blur(65px) saturate(3.5) brightness(0.28);
+            opacity: 0.85;
+            animation: glow-breathe 4s ease-in-out infinite;
+        }
+        @keyframes glow-breathe {
+            0%, 100% { transform: scale(1);    opacity: 0.82; filter: blur(65px) saturate(3.5) brightness(0.26); }
+            50%       { transform: scale(1.12); opacity: 1;    filter: blur(48px) saturate(4.5) brightness(0.38); }
+        }
+
+        /* El disco */
+        .vinyl-disc {
             position: absolute;
             inset: 0;
-            width: 100%; height: 100%;
-            object-fit: cover;
-            filter: brightness(0.4);
-            animation: kenburns 20s ease-in-out infinite alternate;
-            transform-origin: center center;
+            border-radius: 50%;
+            background: #111;
+            animation: vinyl-spin 10s linear infinite;
+            animation-play-state: paused;
+            box-shadow:
+                0 0 0 1px #222,
+                0 0 0 3px #111,
+                0 30px 100px rgba(0,0,0,0.98),
+                inset 0 0 40px rgba(0,0,0,0.5);
         }
-        @keyframes kenburns {
-            from { transform: scale(1)    translate(0, 0); }
-            to   { transform: scale(1.08) translate(-1.5%, -1.5%); }
+        .artist-slide.active .vinyl-disc { animation-play-state: running; }
+        @keyframes vinyl-spin { to { transform: rotate(360deg); } }
+
+        /* Surcos */
+        .vinyl-disc::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: repeating-radial-gradient(
+                circle at 50% 50%,
+                transparent 0px, transparent 2px,
+                rgba(255,255,255,0.018) 2px, rgba(255,255,255,0.018) 3px
+            );
         }
-        .artist-info h2 {
-            font-size: 8vw;
+
+        /* Reflejo sutil en el borde */
+        .vinyl-disc::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.055) 0%, transparent 35%);
+            pointer-events: none;
+        }
+
+        /* Etiqueta (portada del álbum) */
+        .vinyl-label {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 46%; height: 46%;
+            border-radius: 50%;
+            overflow: hidden;
+            z-index: 2;
+            box-shadow:
+                0 0 0 1px rgba(255,255,255,0.14),
+                0 0 0 3px rgba(0,0,0,0.6),
+                0 0 25px rgba(0,0,0,0.7);
+        }
+        .vinyl-label img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+        /* Agujero central */
+        .vinyl-hole {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 3.5%; height: 3.5%;
+            background: radial-gradient(circle, #0a0a0a, #040404);
+            border-radius: 50%;
+            z-index: 3;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.07);
+        }
+
+        /* Overlay de texto — no gira, flota sobre el disco */
+        .vinyl-text-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* Degradado sutil para legibilidad del texto */
+        .vinyl-text-overlay::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background:
+                radial-gradient(ellipse 75% 30% at 50% 22%, rgba(0,0,0,0.55) 0%, transparent 100%),
+                radial-gradient(ellipse 65% 28% at 50% 84%, rgba(0,0,0,0.5) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* Nombre del artista — zona superior entre surcos y etiqueta */
+        .vinyl-artist-name {
+            pointer-events: auto;
+            position: absolute;
+            top: 13%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 72%;
+            text-align: center;
+            font-size: clamp(1.1rem, 4vw, 4rem);
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: -2px;
+            letter-spacing: -1px;
+            line-height: 1;
+            color: #fff;
+            text-shadow: 0 2px 24px rgba(0,0,0,0.95), 0 0 50px rgba(0,0,0,0.8);
+            word-break: break-word;
+            hyphens: auto;
             margin: 0;
-            background: linear-gradient(to bottom, #fff, #64748b);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            transition: letter-spacing 0.5s ease, text-shadow 0.5s ease;
+        }
+        .vinyl-artist-name:hover {
+            letter-spacing: 3px;
+            text-shadow: 0 0 40px rgba(255,255,255,0.55), 0 2px 24px rgba(0,0,0,0.9);
+        }
+
+        /* Botón catálogo — zona inferior */
+        .vinyl-catalog-btn {
+            pointer-events: auto;
+            position: absolute;
+            bottom: 13%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            padding: 0.75rem 2.2rem;
+            background: rgba(255,255,255,0.9);
+            color: #000;
+            font-weight: 800;
+            border-radius: 9999px;
+            font-size: clamp(0.7rem, 1.3vw, 1rem);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 28px rgba(0,0,0,0.65);
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .vinyl-catalog-btn:hover {
+            background: #fff;
+            transform: translateX(-50%) scale(1.08);
+            box-shadow: 0 6px 36px rgba(0,0,0,0.8);
+        }
+
+        /* Ondas de sonido que emanan del disco */
+        .vinyl-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 0 1.5px rgba(255,255,255,0.22), 0 0 14px rgba(255,255,255,0.06);
+            animation: ring-expand 2.6s ease-out infinite;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .vinyl-ring-2 { animation-delay: 0.87s; }
+        .vinyl-ring-3 { animation-delay: 1.73s; }
+        @keyframes ring-expand {
+            0%   { transform: scale(0.97); opacity: 0.5; }
+            100% { transform: scale(1.75); opacity: 0; }
+        }
+
+        /* Hover sobre la escena: ondas más rápidas + glow más intenso */
+        .vinyl-scene:hover .vinyl-ring    { animation-duration: 1.4s; }
+        .vinyl-scene:hover .vinyl-glow    { opacity: 1; filter: blur(50px) saturate(4.5) brightness(0.42); transition: opacity 0.4s, filter 0.4s; }
+
+        @media (max-width: 768px) {
+            .vinyl-scene { width: min(88vw, 78vh); height: min(88vw, 78vh); }
+            .vinyl-artist-name { font-size: clamp(1rem, 6.5vw, 2.8rem); top: 11%; width: 68%; }
+            .vinyl-catalog-btn { font-size: clamp(0.7rem, 2.5vw, 0.9rem); bottom: 11%; padding: 0.6rem 1.6rem; }
         }
 
         .nav-arrow {
@@ -528,9 +709,15 @@
             <div class="flex items-center gap-2 cursor-pointer" onclick="showSection('home')">
                 <img src="static/img/2.png" alt="SoundScape" class="h-8 object-contain">
             </div>
-            <button class="p-2 text-white" onclick="toggleMobileMenu()">
-                <i data-lucide="menu"></i>
-            </button>
+            <div class="flex items-center gap-1">
+                <button class="relative p-2 text-white" onclick="openCart()">
+                    <i data-lucide="shopping-cart"></i>
+                    <span id="mobile-cart-count" class="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-xs font-bold rounded-full w-4 h-4 items-center justify-center hidden" style="display:none;font-size:10px;line-height:16px;">0</span>
+                </button>
+                <button class="p-2 text-white" onclick="toggleMobileMenu()">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
         </header>
 
         <div id="mobile-menu" class="mobile-menu-overlay">
@@ -544,6 +731,14 @@
                 <a class="text-4xl font-bold" onclick="showSection('extras'); toggleMobileMenu()">Extras</a>
                 <a class="text-4xl font-bold text-emerald-500" onclick="showSection('sustainability'); toggleMobileMenu()">Eco</a>
             </nav>
+            <!-- Auth / Admin -->
+            <div class="mt-auto pt-8 border-t border-white/10 flex flex-col items-center gap-5 w-full pb-6">
+                <a id="mobile-nav-admin" class="hidden text-2xl font-bold text-blue-400 cursor-pointer" href="/admin/" onclick="toggleMobileMenu()">Panel Admin</a>
+                <a id="mobile-nav-login" class="text-2xl font-bold cursor-pointer" onclick="toggleMobileMenu(); showLogin()">
+                    <span id="mobile-login-label">Iniciar Sesión</span>
+                </a>
+                <a id="mobile-nav-logout" class="hidden text-lg font-semibold text-slate-500 cursor-pointer" onclick="handleLogout(); toggleMobileMenu()">Cerrar Sesión</a>
+            </div>
         </div>
 
         <!-- MAIN VIEWPORT -->
@@ -748,6 +943,6 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="static/js/main.js?v=4"></script>
+    <script src="static/js/main.js?v=5"></script>
 </body>
 </html>
