@@ -648,11 +648,47 @@
         }
         .tracklist-row:hover { background: rgba(255,255,255,0.06); }
 
+        /* ── SECCIONES DESPLEGABLES DEL CATÁLOGO ─────────────────── */
+        .catalog-section { border-top: 1px solid rgba(255,255,255,0.07); margin-top: 1.75rem; }
+        .catalog-section-btn {
+            width: 100%; display: flex; align-items: center; justify-content: space-between;
+            padding: 1.1rem 0; background: none; border: none; color: #fff; cursor: pointer;
+            font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+            transition: color 0.2s;
+        }
+        .catalog-section-btn:hover { color: rgba(255,255,255,0.5); }
+        .catalog-section-body { overflow: hidden; max-height: 0; transition: max-height 0.45s ease; }
+        .catalog-section-body.open { max-height: 9999px; padding-bottom: 2rem; }
+        .catalog-chevron { transition: transform 0.35s ease; flex-shrink: 0; }
+        .catalog-chevron.open { transform: rotate(180deg); }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: 0.75rem; }
+        .stat-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 1.1rem 1rem; }
+        .stat-card .num { font-size: 1.75rem; font-weight: 800; line-height: 1; margin-bottom: 0.25rem; color: #fff; }
+        .stat-card .lbl { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: rgba(255,255,255,0.32); }
+
+        /* Tracklist global */
+        .track-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .track-row:last-child { border-bottom: none; }
+        .track-num { font-size: 0.68rem; color: rgba(255,255,255,0.22); width: 1.4rem; text-align: right; flex-shrink: 0; }
+        .track-info { flex: 1; min-width: 0; }
+        .track-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-album { font-size: 0.68rem; color: rgba(255,255,255,0.32); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-dur { font-size: 0.68rem; color: rgba(255,255,255,0.32); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+        .track-yt { flex-shrink: 0; color: rgba(255,255,255,0.28); transition: color 0.2s; text-decoration: none; }
+        .track-yt:hover { color: #f87171; }
+
+        /* Spotify */
+        .spotify-section { display:flex; flex-direction:column; gap:1rem; }
+        .spotify-lbl { font-size:0.68rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:0.3rem; }
+
         @media(max-width:640px) {
             .catalog-artist-header { flex-direction: column; }
             .catalog-artist-photo { width: 90px; height: 90px; }
             .discography-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
             #album-modal-card { max-height: 88vh; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
         }
     </style>
 </head>
@@ -943,6 +979,6 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="static/js/main.js?v=5"></script>
+    <script src="static/js/main.js?v=7"></script>
 </body>
 </html>

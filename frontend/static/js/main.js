@@ -259,6 +259,34 @@ function renderEvents() {
     if (window.lucide) lucide.createIcons();
 }
 
+// ── HELPERS CATÁLOGO ────────────────────────────────────────────
+function parseDuration(str) {
+    if (!str) return 0;
+    const p = str.split(':').map(Number);
+    if (p.length === 3) return p[0]*3600 + p[1]*60 + p[2];
+    if (p.length === 2) return p[0]*60 + p[1];
+    return 0;
+}
+function fmtDur(str) {
+    if (!str) return '';
+    const p = str.split(':');
+    return p.length === 3 ? `${p[1]}:${p[2]}` : str;
+}
+function fmtTotalDur(secs) {
+    const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60);
+    return h > 0 ? `${h}h ${m}m` : `${m}m`;
+}
+function spotifyId(url) {
+    const m = url && url.match(/album\/([A-Za-z0-9]+)/);
+    return m ? m[1] : null;
+}
+function toggleCatalogSection(id) {
+    const body = document.getElementById('cs-' + id);
+    const chev = document.getElementById('cc-' + id);
+    if (body) body.classList.toggle('open');
+    if (chev) chev.classList.toggle('open');
+}
+
 // CATÁLOGO DE ARTISTA
 function viewArtistCatalog(index) {
     const artist = artistsData[index];
@@ -275,10 +303,72 @@ function viewArtistCatalog(index) {
     const metaParts  = [artist.country, debutYear ? `Debut ${debutYear}` : null, birthYear ? `Nacido en ${birthYear}` : null].filter(Boolean);
     const albumCount = (artist.albums || []).length;
 
-    catalogContent.innerHTML = `
-        <div style="padding-top: 1rem; padding-bottom: 3rem;">
+    // ── Datos para las secciones extra ──────────────────────────
+    const allSongs   = artist.albums.flatMap(a => a.songs || []);
+    const totalSecs  = allSongs.reduce((s, t) => s + parseDuration(t.duration), 0);
+    const years      = artist.albums.map(a => new Date(a.release_date).getFullYear()).filter(Boolean);
+    const firstYear  = years.length ? Math.min(...years) : null;
+    const lastYear   = years.length ? Math.max(...years) : null;
 
-            <!-- HEADER HORIZONTAL -->
+    // Estadísticas
+    const statsHtml = `
+        <div class="stats-grid">
+            <div class="stat-card"><div class="num">${albumCount}</div><div class="lbl">Álbumes</div></div>
+            <div class="stat-card"><div class="num">${allSongs.length}</div><div class="lbl">Canciones</div></div>
+            ${totalSecs > 0 ? `<div class="stat-card"><div class="num">${fmtTotalDur(totalSecs)}</div><div class="lbl">Duración total</div></div>` : ''}
+            ${firstYear ? `<div class="stat-card"><div class="num">${firstYear}</div><div class="lbl">Primer álbum</div></div>` : ''}
+            ${lastYear  ? `<div class="stat-card"><div class="num">${lastYear}</div><div class="lbl">Último álbum</div></div>` : ''}
+            ${firstYear && lastYear && lastYear > firstYear ? `<div class="stat-card"><div class="num">${lastYear - firstYear}a</div><div class="lbl">Años activo</div></div>` : ''}
+        </div>`;
+
+    // Todas las canciones
+    let trackNum = 0;
+    const tracksHtml = artist.albums.flatMap((album, ai) =>
+        (album.songs || []).map(song => {
+            trackNum++;
+            return `
+            <div class="track-row">
+                <span class="track-num">${trackNum}</span>
+                <div class="track-info">
+                    <div class="track-title">${song.song_title}</div>
+                    <div class="track-album">${album.album_title}</div>
+                </div>
+                <span class="track-dur">${fmtDur(song.duration)}</span>
+                ${song.video_url ? `<a href="${song.video_url}" target="_blank" rel="noopener noreferrer" class="track-yt"><i data-lucide="play-circle" size="18"></i></a>` : ''}
+            </div>`;
+        })
+    ).join('');
+
+    // Spotify embeds
+    const spotifyAlbums = artist.albums.filter(a => spotifyId(a.spotify));
+    const spotifyHtml = spotifyAlbums.length === 0
+        ? `<p class="text-slate-600 text-sm">No hay links de Spotify disponibles para este artista.</p>`
+        : spotifyAlbums.map(album => `
+            <div>
+                <p class="spotify-lbl">${album.album_title}</p>
+                <iframe src="https://open.spotify.com/embed/album/${spotifyId(album.spotify)}?utm_source=generator&theme=0"
+                    width="100%" height="152" frameborder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy" style="border-radius:12px;display:block;"></iframe>
+            </div>`).join('');
+
+    // ── Sección desplegable helper ───────────────────────────────
+    const section = (id, icon, label, content, startOpen = false) => `
+        <div class="catalog-section">
+            <button class="catalog-section-btn" onclick="toggleCatalogSection('${id}')">
+                <span style="display:flex;align-items:center;gap:0.6rem">
+                    <i data-lucide="${icon}" size="16"></i>${label}
+                </span>
+                <i data-lucide="chevron-down" id="cc-${id}" class="catalog-chevron${startOpen ? ' open' : ''}" size="16"></i>
+            </button>
+            <div class="catalog-section-body${startOpen ? ' open' : ''}" id="cs-${id}">
+                ${content}
+            </div>
+        </div>`;
+
+    catalogContent.innerHTML = `
+        <div style="padding-top:1rem;padding-bottom:3rem;">
+
             <div class="catalog-artist-header">
                 <div class="catalog-artist-top">
                     ${artist.image ? `<img src="${artist.image}" class="catalog-artist-photo" alt="${artist.artist_name}">` : ''}
@@ -298,27 +388,27 @@ function viewArtistCatalog(index) {
                 ${artist.description ? `<p class="catalog-artist-bio">${artist.description}</p>` : ''}
             </div>
 
-            <!-- DISCOGRAFÍA -->
             <h3 class="text-base font-black mb-4 tracking-tight flex items-center gap-2 uppercase">
                 <i data-lucide="disc-3" class="text-blue-500" size="18"></i>
                 Discografía
                 <span class="text-slate-600 font-normal text-xs normal-case">${albumCount} álbum${albumCount !== 1 ? 'es' : ''}</span>
             </h3>
-
             <div class="discography-grid">
-                ${(artist.albums || []).map((album, ai) => `
+                ${artist.albums.map((album, ai) => `
                     <div class="album-card" onclick="openAlbumModal(${ai})">
                         <img src="${album.cover_album}" alt="${album.album_title}" loading="lazy">
                         <div class="album-card-body">
                             <p class="font-bold text-sm leading-tight mb-0.5">${album.album_title}</p>
                             <p class="text-slate-500 text-xs">${new Date(album.release_date).getFullYear()} · ${album.total_track} canciones</p>
                         </div>
-                    </div>
-                `).join('')}
+                    </div>`).join('')}
             </div>
 
-        </div>
-    `;
+            ${section('stats',   'bar-chart-2', 'Estadísticas',        statsHtml,  true)}
+            ${section('tracks',  'list-music',  'Todas las canciones', tracksHtml, false)}
+            ${section('spotify', 'music',       'Escuchar en Spotify', `<div class="spotify-section">${spotifyHtml}</div>`, false)}
+
+        </div>`;
 
     catalogOverlay.style.display = 'block';
     setTimeout(() => catalogOverlay.classList.add('active'), 10);
