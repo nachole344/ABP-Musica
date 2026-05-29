@@ -10,7 +10,7 @@ class Product(db.Model):
     __tablename__ = 'products'
     
     product_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artists.artist_id'), nullable=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.artist_id', ondelete='CASCADE'), nullable=True)
     product_name = db.Column(db.String(250), nullable=False, unique=True)
     product_type = db.Column(product_type_enum, nullable=False)
     price = db.Column(db.Numeric(10, 2), nullable=False)

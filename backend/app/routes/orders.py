@@ -1,5 +1,5 @@
 from datetime import date
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from ..init import db
 from ..models.product import Product
 
@@ -14,8 +14,10 @@ def _get_models():
 
 @orders_bp.route('/', methods=['GET'])
 def get_orders():
+    if 'user_id' not in session:
+        return jsonify({"error": "No autenticado"}), 401
     Order, _ = _get_models()
-    orders = Order.query.order_by(Order.order_date.desc()).all()
+    orders = Order.query.filter_by(user_id=session['user_id']).order_by(Order.order_date.desc()).all()
     return jsonify([o.to_dict() for o in orders]), 200
 
 
@@ -28,6 +30,8 @@ def get_order_items():
 
 @orders_bp.route('/', methods=['POST'])
 def create_order():
+    if 'user_id' not in session:
+        return jsonify({"error": "No autenticado"}), 401
     Order, OrderItem = _get_models()
     data = request.get_json()
     items = data.get('items', [])
@@ -49,7 +53,7 @@ def create_order():
         total += float(product.price) * qty
         validated.append((product, qty))
 
-    order = Order(order_date=date.today(), total_price=total, status='pending')
+    order = Order(order_date=date.today(), total_price=total, status='pending', user_id=session['user_id'])
     db.session.add(order)
     db.session.flush()
 

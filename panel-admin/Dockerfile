@@ -19,4 +19,4 @@ COPY . .
 # El panel-admin corre en el puerto 5001 según su run.py
 EXPOSE 5001
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "2", "run:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "1", "--reload", "run:app"]

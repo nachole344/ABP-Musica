@@ -28,6 +28,6 @@ def create_app(config_class=Config):
         from flask import session as flask_session
         if 'user_id' in flask_session:
             return redirect(url_for("main.index"))
-        return redirect(url_for("main.login_view"))
+        return redirect("/")
 
     return app

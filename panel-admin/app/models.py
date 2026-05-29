@@ -1,18 +1,21 @@
+from datetime import datetime
 from app import db
 
 class User(db.Model):
     __tablename__ = 'users'
-    
+
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(50), nullable=False)
     role = db.Column(db.String(20), nullable=False, default='user')
+    date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
     def to_dict(self):
         return {
             "user_id": self.user_id,
             "username": self.username,
             "role": self.role,
+            "date": self.date.isoformat() if self.date else None,
         }
 
 class Artist(db.Model):
@@ -52,7 +55,7 @@ class Album(db.Model):
     __tablename__ = "albums"
 
     album_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey("artists.artist_id"), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey("artists.artist_id", ondelete="CASCADE"), nullable=False)
     album_title = db.Column(db.String(100), nullable=False)
     release_date = db.Column(db.Date, nullable=False)
     total_track = db.Column(db.Integer, nullable=False)
@@ -79,7 +82,7 @@ class Song(db.Model):
     __tablename__ = "songs"
 
     song_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    album_id = db.Column(db.Integer, db.ForeignKey("albums.album_id"), nullable=False)
+    album_id = db.Column(db.Integer, db.ForeignKey("albums.album_id", ondelete="CASCADE"), nullable=False)
     song_title = db.Column(db.String(150), nullable=False)
     duration = db.Column(db.Time, nullable=False)
     video_url = db.Column(db.Text, unique=True)
@@ -102,7 +105,7 @@ class Product(db.Model):
     __tablename__ = "products"
 
     product_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey("artists.artist_id"), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey("artists.artist_id", ondelete="CASCADE"), nullable=False)
     product_name = db.Column(db.String(250), nullable=False, unique=True)
     product_type = db.Column(
         db.Enum("album", "vinyl", "clothing", "tote_bag", "pin", name="product_type_enum"),
@@ -128,7 +131,7 @@ class Event(db.Model):
     __tablename__ = "events"
 
     event_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey("artists.artist_id"), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey("artists.artist_id", ondelete="CASCADE"), nullable=False)
     event_name = db.Column(db.String(250), nullable=False)
     event_type = db.Column(
         db.Enum("concert", "tour", "festival", "movie", "tv_series", name="event_type_enum"),

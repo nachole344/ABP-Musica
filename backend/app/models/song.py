@@ -5,7 +5,7 @@ class Song(db.Model):
     __tablename__ = 'songs'
     
     song_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    album_id = db.Column(db.Integer, db.ForeignKey('albums.album_id'), nullable=False)
+    album_id = db.Column(db.Integer, db.ForeignKey('albums.album_id', ondelete='CASCADE'), nullable=False)
     song_title = db.Column(db.String(150), nullable=False)
     duration = db.Column(db.Time, nullable=False)
     video_url = db.Column(db.Text, unique=True)

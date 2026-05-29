@@ -10,7 +10,7 @@ class Event(db.Model):
     __tablename__ = 'events'
     
     event_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artists.artist_id'), nullable=True)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.artist_id', ondelete='CASCADE'), nullable=True)
     event_name = db.Column(db.String(250), nullable=False)
     event_type = db.Column(event_type_enum, nullable=False)
     event_date = db.Column(db.Date, nullable=False)

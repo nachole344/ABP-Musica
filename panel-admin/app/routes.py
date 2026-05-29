@@ -2,6 +2,7 @@ import uuid
 from datetime import date, time
 from functools import wraps
 
+import requests as http
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from app import db
 from app.models import Artist, Album, Song, Event, Product, User
@@ -13,15 +14,45 @@ EVENT_TYPES = ("concert", "tour", "festival", "movie", "tv_series")
 PRODUCT_TYPES = ("album", "vinyl", "clothing", "tote_bag", "pin")
 
 
+FRONTEND_URL = "/"
+BACKEND_CHECK_URL = "http://backend:5000/api/auth/check"
+
+def _verify_backend_session():
+    """Llama al backend para verificar si el usuario logueado es admin."""
+    cookie = request.cookies.get('session')
+    if not cookie:
+        return None
+    try:
+        resp = http.get(BACKEND_CHECK_URL, cookies={'session': cookie}, timeout=2)
+        if not resp.ok:
+            return None
+        data = resp.json()
+        if data.get('logged_in') and data.get('user', {}).get('role') == 'admin':
+            return data['user']
+    except Exception:
+        pass
+    return None
+
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:
-            return redirect(url_for("main.login_view"))
-        user = User.query.get(session['user_id'])
-        if not user or user.role != 'admin':
-            return redirect(url_for("main.login_view"))
-        return f(*args, **kwargs)
+        # Si ya hay sesión propia del panel, úsala
+        if 'user_id' in session:
+            user = User.query.get(session['user_id'])
+            if user and user.role == 'admin':
+                return f(*args, **kwargs)
+
+        # Si no, verificar con el backend
+        backend_user = _verify_backend_session()
+        if backend_user:
+            user = User.query.filter_by(username=backend_user['username']).first()
+            if user and user.role == 'admin':
+                session['user_id'] = user.user_id
+                session['username'] = user.username
+                return f(*args, **kwargs)
+
+        return redirect(FRONTEND_URL)
     return decorated_function
 
 
@@ -38,28 +69,10 @@ def parse_date(val):
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
 
-@bp.route("/login", methods=["GET", "POST"])
-def login_view():
-    if request.method == "POST":
-        username = request.form.get("username") or (request.get_json() or {}).get("username")
-        password = request.form.get("password") or (request.get_json() or {}).get("password")
-        user = User.query.filter_by(username=username).first()
-        if user and user.password == password and user.role == 'admin':
-            session['user_id'] = user.user_id
-            session['username'] = user.username
-            if request.is_json:
-                return jsonify({"message": "Login exitoso", "user": user.to_dict()}), 200
-            return redirect(url_for("main.index"))
-        if request.is_json:
-            return jsonify({"error": "Credenciales inválidas"}), 401
-        return render_template("login.html", error="Credenciales inválidas")
-    return render_template("login.html", error=None)
-
-
 @bp.route("/logout")
 def logout_view():
     session.clear()
-    return redirect(url_for("main.login_view"))
+    return redirect(FRONTEND_URL)
 
 
 # ── Pages ────────────────────────────────────────────────────────────────────
@@ -631,6 +644,51 @@ def delete_event(event_id):
     db.session.commit()
     flash("Evento eliminado", "success")
     return redirect(url_for("main.list_events"))
+
+
+# ── Users CRUD ───────────────────────────────────────────────────────────────
+
+@bp.route("/users")
+@login_required
+def list_users():
+    users = User.query.order_by(User.date.desc()).all()
+    return render_template("users/list.html", users=users)
+
+
+@bp.route("/users/<int:user_id>")
+@login_required
+def view_user(user_id):
+    user = User.query.get_or_404(user_id)
+    return render_template("users/view.html", user=user)
+
+
+@bp.route("/users/<int:user_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if request.method == "POST":
+        user.username = request.form["username"]
+        user.role     = request.form["role"]
+        new_password  = request.form.get("password", "").strip()
+        if new_password:
+            user.password = new_password
+        db.session.commit()
+        flash("Usuario actualizado", "success")
+        return redirect(url_for("main.view_user", user_id=user.user_id))
+    return render_template("users/form.html", user=user)
+
+
+@bp.route("/users/<int:user_id>/delete", methods=["POST"])
+@login_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.user_id == session.get("user_id"):
+        flash("No puedes eliminar tu propia cuenta", "danger")
+        return redirect(url_for("main.list_users"))
+    db.session.delete(user)
+    db.session.commit()
+    flash("Usuario eliminado", "success")
+    return redirect(url_for("main.list_users"))
 
 
 # ── Products CRUD ────────────────────────────────────────────────────────────

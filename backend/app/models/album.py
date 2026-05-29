@@ -5,7 +5,7 @@ class Album(db.Model):
     __tablename__ = 'albums'
     
     album_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    artist_id = db.Column(db.Integer, db.ForeignKey('artists.artist_id'), nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artists.artist_id', ondelete='CASCADE'), nullable=False)
     album_title = db.Column(db.String(100), nullable=False)
     release_date = db.Column(db.Date, nullable=False)
     total_track = db.Column(db.Integer, nullable=False)

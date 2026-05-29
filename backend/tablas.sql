@@ -10,6 +10,23 @@ CREATE TYPE order_status_enum AS ENUM (
 'pending', 'paid', 'shipped', 'delivered', 'cancelled'
 );
 
+CREATE TABLE IF NOT EXISTS users (
+user_id INT GENERATED ALWAYS AS IDENTITY,
+username VARCHAR(50),
+password VARCHAR(50),
+role VARCHAR(20) DEFAULT 'user',
+date TIMESTAMP DEFAULT NOW(),
+
+
+CONSTRAINT pk_users_user_id PRIMARY KEY (user_id),
+
+CONSTRAINT nn_users_username CHECK (username IS NOT NULL),
+CONSTRAINT nn_users_password CHECK (password IS NOT NULL),
+CONSTRAINT nn_users_role CHECK (role IS NOT NULL),
+CONSTRAINT nn_users_date CHECK (date IS NOT NULL),
+
+CONSTRAINT uk_users_username UNIQUE (username)
+);
 
 CREATE TABLE IF NOT EXISTS artists (
 artist_id INT GENERATED ALWAYS AS IDENTITY,
@@ -61,7 +78,7 @@ CONSTRAINT nn_albums_cover_album CHECK (cover_album IS NOT NULL),
 CONSTRAINT nn_albums_spotify CHECK (spotify IS NOT NULL),
 CONSTRAINT nn_albums_mb_album_id CHECK (mb_album_id IS NOT NULL),
 
-CONSTRAINT fk_albums_artist_id FOREIGN KEY (artist_id) REFERENCES artists (artist_id),
+CONSTRAINT fk_albums_artist_id FOREIGN KEY (artist_id) REFERENCES artists (artist_id) ON DELETE CASCADE,
 
 CONSTRAINT uk_albums_artist_id_album_title UNIQUE (artist_id, album_title),
 CONSTRAINT uk_albums_cover_album UNIQUE (cover_album),
@@ -88,7 +105,7 @@ CONSTRAINT nn_songs_mb_song_id CHECK (mb_song_id IS NOT NULL),
 
 CONSTRAINT ck_songs_duration CHECK (duration > '00:00:00'),
 
-CONSTRAINT fk_songs_album_id FOREIGN KEY (album_id) REFERENCES albums (album_id),
+CONSTRAINT fk_songs_album_id FOREIGN KEY (album_id) REFERENCES albums (album_id) ON DELETE CASCADE,
 
 CONSTRAINT uk_songs_album_id_song_title UNIQUE (album_id, song_title),
 CONSTRAINT uk_songs_video_url UNIQUE (video_url),
@@ -116,7 +133,7 @@ CONSTRAINT nn_products_image_url CHECK (image_url IS NOT NULL),
 CONSTRAINT ck_products_price CHECK (price >= 0),
 CONSTRAINT ck_products_stock CHECK (stock >= 0),
 
-CONSTRAINT fk_products_artist_id FOREIGN KEY (artist_id) REFERENCES artists (artist_id),
+CONSTRAINT fk_products_artist_id FOREIGN KEY (artist_id) REFERENCES artists (artist_id) ON DELETE CASCADE,
 
 CONSTRAINT uk_products_product_name UNIQUE (product_name),
 CONSTRAINT uk_products_image_url UNIQUE (image_url)
@@ -138,7 +155,7 @@ CONSTRAINT nn_events_event_type CHECK (event_type IS NOT NULL),
 CONSTRAINT nn_events_event_date CHECK (event_date IS NOT NULL),
 CONSTRAINT nn_events_poster CHECK (poster IS NOT NULL),
 
-CONSTRAINT fk_events_artist_id FOREIGN KEY (artist_id) REFERENCES artists (artist_id),
+CONSTRAINT fk_events_artist_id FOREIGN KEY (artist_id) REFERENCES artists (artist_id) ON DELETE CASCADE,
 
 CONSTRAINT uk_events_artist_id_event_name UNIQUE (artist_id, event_name),
 CONSTRAINT uk_events_poster UNIQUE (poster)
@@ -155,13 +172,14 @@ CONSTRAINT nn_carts_quantity CHECK (quantity IS NOT NULL),
 
 CONSTRAINT ck_carts_quantity CHECK (quantity > 0),
 
-CONSTRAINT fk_carts_product_id FOREIGN KEY (product_id) REFERENCES products (product_id),
+CONSTRAINT fk_carts_product_id FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE,
 
 CONSTRAINT uk_cart_product_id UNIQUE (product_id)
 );
 
 CREATE TABLE IF NOT EXISTS orders (
 order_id INT GENERATED ALWAYS AS IDENTITY,
+user_id INT DEFAULT 5,
 order_date DATE,
 total_price DECIMAL(10, 2),
 status order_status_enum,
@@ -171,6 +189,9 @@ CONSTRAINT pk_orders_order_id PRIMARY KEY (order_id),
 CONSTRAINT nn_orders_order_date CHECK (order_date IS NOT NULL),
 CONSTRAINT nn_orders_total_price CHECK (total_price IS NOT NULL),
 CONSTRAINT nn_orders_status CHECK (status IS NOT NULL),
+CONSTRAINT nn_orders_user_id CHECK (user_id IS NOT NULL),
+
+CONSTRAINT fk_orders_user_id FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE,
 
 CONSTRAINT ck_orders_total_price CHECK (total_price >= 0)
 );
@@ -190,20 +211,8 @@ CONSTRAINT nn_order_items_price CHECK (price IS NOT NULL),
 CONSTRAINT ck_order_items_quantity CHECK (quantity > 0),
 CONSTRAINT ck_order_items_price CHECK (price >= 0),
 
-CONSTRAINT fk_order_items_order_id FOREIGN KEY (order_id) REFERENCES orders (order_id),
-CONSTRAINT fk_order_items_product_id FOREIGN KEY (product_id) REFERENCES products (product_id)
+CONSTRAINT fk_order_items_order_id FOREIGN KEY (order_id) REFERENCES orders (order_id) ON DELETE CASCADE,
+CONSTRAINT fk_order_items_product_id FOREIGN KEY (product_id) REFERENCES products (product_id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS users (
-user_id INT GENERATED ALWAYS AS IDENTITY,
-username VARCHAR(50),
-password VARCHAR(50),
-role VARCHAR(20) DEFAULT 'user',
 
-CONSTRAINT pk_users_user_id PRIMARY KEY (user_id),
-
-CONSTRAINT nn_users_username CHECK (username IS NOT NULL),
-CONSTRAINT nn_users_password CHECK (password IS NOT NULL),
-
-CONSTRAINT uk_users_username UNIQUE (username)
-);

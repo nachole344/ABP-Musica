@@ -158,6 +158,37 @@ ABP-Musica/
 
 ---
 
+## Testing
+
+### Unit tests + API tests (sin Docker)
+
+Prueban modelos y endpoints usando SQLite en memoria, no requieren que el stack esté levantado.
+
+```bash
+cd backend
+pip install -r requirements.txt -r requirements-test.txt
+python3 -m pytest tests/ -v
+```
+
+### E2E tests (requiere Docker)
+
+Prueban la UI y las APIs reales en el navegador con Playwright.
+
+```bash
+# 1. Levanta el stack (si no está ya corriendo)
+docker compose up -d
+
+# 2. Instala dependencias E2E (solo la primera vez)
+pip install -r tests/e2e/requirements-e2e.txt
+python3 -m playwright install chromium
+
+# 3. Ejecuta
+cd tests/e2e
+python3 -m pytest . -v
+```
+
+---
+
 ## Credenciales por defecto
 
 | Usuario | Contraseña | Role |
@@ -191,7 +222,7 @@ ABP-Musica/
 - [x] Carrusel de artistas con vinilo animado
 - [x] Carrito de compra y pedidos con stock real
 - [x] Despliegue en producción con Cloudflare Tunnel
-- [ ] Tests automatizados (pendiente)
+- [x] Tests automatizados (unit, API, E2E)
 - [ ] Hashing de contraseñas con bcrypt (pendiente)
 - [ ] Integración Spotify Web Playback SDK (escalabilidad futura)
 - [ ] PWA (escalabilidad futura)
