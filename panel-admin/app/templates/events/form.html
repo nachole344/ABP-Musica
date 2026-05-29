@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if event else "Nuevo" }} Evento{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{{ url_for('main.list_events') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <h1 class="mb-0">{{ "Editar" if event else "Nuevo" }} Evento</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Artista</label>
+                        <select name="artist_id" class="form-select" required>
+                            <option value="">Seleccionar artista...</option>
+                            {% for a in artists %}
+                            <option value="{{ a.artist_id }}"
+                                {{ "selected" if event and event.artist_id == a.artist_id else "" }}>
+                                {{ a.artist_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre del evento</label>
+                        <input type="text" name="event_name" class="form-control"
+                               value="{{ event.event_name if event else '' }}"
+                               placeholder="ej. World Tour 2025" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Tipo de evento</label>
+                            <select name="event_type" class="form-select" required>
+                                {% for t in event_types %}
+                                <option value="{{ t }}"
+                                    {{ "selected" if event and event.event_type == t else "" }}>
+                                    {{ t.replace('_', ' ').title() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Fecha</label>
+                            <input type="date" name="event_date" class="form-control"
+                                   value="{{ event.event_date.isoformat() if event else '' }}" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Lugar <span class="text-muted fw-normal">(opcional)</span></label>
+                        <input type="text" name="location" class="form-control"
+                               value="{{ event.location if event and event.location else '' }}"
+                               placeholder="ej. Palau Sant Jordi, Barcelona">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">URL del póster <span class="text-muted fw-normal">(opcional)</span></label>
+                        <input type="text" name="poster" id="poster_input" class="form-control"
+                               value="{{ event.poster if event and not event.poster.startswith('no-poster') else '' }}"
+                               placeholder="https://..."
+                               oninput="previewPoster(this.value)">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning fw-bold">
+                            <i class="bi bi-check-lg me-1"></i>Guardar
+                        </button>
+                        <a href="{{ url_for('main.list_events') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 text-center">
+                <p class="text-muted small fw-semibold text-uppercase mb-2">Vista previa del póster</p>
+                <img id="poster-preview"
+                     src="{{ event.poster if event and not event.poster.startswith('no-poster') else '' }}"
+                     class="img-fluid rounded"
+                     style="max-height:300px;object-fit:contain;"
+                     onerror="this.src='https://via.placeholder.com/400x300?text=Sin+póster'"
+                     alt="Preview">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function previewPoster(url) {
+    const img = document.getElementById("poster-preview");
+    img.src = url || "https://via.placeholder.com/400x300?text=Sin+póster";
+}
+</script>
+{% endblock %}

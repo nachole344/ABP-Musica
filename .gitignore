@@ -19,3 +19,6 @@ node_modules/
 # Database dumps
 *.dump
 *.sql
+
+# Documentation
+*.md

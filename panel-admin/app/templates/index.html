@@ -1,50 +1,255 @@
 {% extends "base.html" %}
-{% block title %}Inicio - Artist App{% endblock %}
+{% block title %}Panel de administración{% endblock %}
 {% block content %}
-<div class="text-center py-5">
-    <h1 class="display-4">Artist App</h1>
-    <p class="lead">Catálogo de artistas, álbumes y canciones</p>
-    <div class="d-flex justify-content-center gap-3 mt-4">
-        <a href="{{ url_for('main.list_artists') }}" class="btn btn-primary btn-lg">Artistas</a>
-        <a href="{{ url_for('main.list_albums') }}" class="btn btn-success btn-lg">Álbumes</a>
-        <a href="{{ url_for('main.list_songs') }}" class="btn btn-info btn-lg text-white">Canciones</a>
-        <a href="{{ url_for('main.musicbrainz_import') }}" class="btn btn-warning btn-lg">Import MusicBrainz</a>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-0">Panel de administración</h1>
+        <p class="text-muted mb-0">Gestiona artistas, álbumes, canciones, eventos y tienda</p>
+    </div>
+    <a href="{{ url_for('main.musicbrainz_import') }}" class="btn btn-warning">
+        <i class="bi bi-cloud-download me-1"></i>Import MusicBrainz
+    </a>
+</div>
+
+{# ── Tarjetas de estadísticas ───────────────────────────────────────── #}
+<div class="row g-3 mb-5">
+    <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('main.list_artists') }}" class="text-decoration-none">
+            <div class="card h-100 border-primary">
+                <div class="card-body text-center py-3">
+                    <i class="bi bi-person-fill fs-2 text-primary"></i>
+                    <div class="fs-3 fw-bold mt-1">{{ stats.artists }}</div>
+                    <div class="text-muted small">Artistas</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('main.list_albums') }}" class="text-decoration-none">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center py-3">
+                    <i class="bi bi-disc-fill fs-2 text-success"></i>
+                    <div class="fs-3 fw-bold mt-1">{{ stats.albums }}</div>
+                    <div class="text-muted small">Álbumes</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('main.list_songs') }}" class="text-decoration-none">
+            <div class="card h-100 border-info">
+                <div class="card-body text-center py-3">
+                    <i class="bi bi-music-note-beamed fs-2 text-info"></i>
+                    <div class="fs-3 fw-bold mt-1">{{ stats.songs }}</div>
+                    <div class="text-muted small">Canciones</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('main.list_events') }}" class="text-decoration-none">
+            <div class="card h-100 border-warning">
+                <div class="card-body text-center py-3">
+                    <i class="bi bi-calendar-event-fill fs-2 text-warning"></i>
+                    <div class="fs-3 fw-bold mt-1">{{ stats.events }}</div>
+                    <div class="text-muted small">Eventos</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('main.list_products') }}" class="text-decoration-none">
+            <div class="card h-100 border-danger">
+                <div class="card-body text-center py-3">
+                    <i class="bi bi-bag-fill fs-2 text-danger"></i>
+                    <div class="fs-3 fw-bold mt-1">{{ stats.products }}</div>
+                    <div class="text-muted small">Productos</div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('main.musicbrainz_import') }}" class="text-decoration-none">
+            <div class="card h-100 border-secondary">
+                <div class="card-body text-center py-3">
+                    <i class="bi bi-cloud-download fs-2 text-secondary"></i>
+                    <div class="fs-3 fw-bold mt-1">MB</div>
+                    <div class="text-muted small">Import</div>
+                </div>
+            </div>
+        </a>
     </div>
 </div>
 
-<h2 class="mb-3">Artistas</h2>
-<div class="row">
-    {% for artist in artists %}
-    <div class="col-md-4 mb-3">
-        <div class="card h-100">
-            <img src="{{ artist.image }}" class="card-img-top" alt="{{ artist.artist_name }}" style="height:200px;object-fit:cover;" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
-            <div class="card-body">
-                <h5 class="card-title">{{ artist.artist_name }}</h5>
-                <p class="card-text text-muted">{{ artist.country }}</p>
-                <a href="{{ url_for('main.view_artist', artist_id=artist.artist_id) }}" class="btn btn-sm btn-primary">Ver</a>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <p class="text-muted">No hay artistas todavía. <a href="{{ url_for('main.musicbrainz_import') }}">Importa uno</a>.</p>
-    {% endfor %}
-</div>
+{# ── Contenido principal ────────────────────────────────────────────── #}
+<div class="row g-4">
 
-{% if albums %}
-<h2 class="mb-3 mt-4">Álbumes recientes</h2>
-<div class="row">
-    {% for album in albums %}
-    <div class="col-md-4 mb-3">
+    {# Artistas #}
+    <div class="col-12 col-lg-6">
         <div class="card h-100">
-            <img src="{{ album.cover_album }}" class="card-img-top" alt="{{ album.album_title }}" style="height:200px;object-fit:cover;" onerror="this.src='https://via.placeholder.com/400x200?text=No+Cover'">
-            <div class="card-body">
-                <h5 class="card-title">{{ album.album_title }}</h5>
-                <p class="card-text text-muted">{{ album.artist.artist_name }}</p>
-                <a href="{{ url_for('main.view_album', album_id=album.album_id) }}" class="btn btn-sm btn-success">Ver</a>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-person-fill me-2 text-primary"></i>Artistas</span>
+                <a href="{{ url_for('main.new_artist') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg"></i> Nuevo
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if artists %}
+                <ul class="list-group list-group-flush">
+                    {% for artist in artists[:6] %}
+                    <li class="list-group-item d-flex align-items-center gap-3 py-2">
+                        <img src="{{ artist.image }}" alt="{{ artist.artist_name }}"
+                             style="width:44px;height:44px;object-fit:cover;border-radius:50%;"
+                             onerror="this.src='https://via.placeholder.com/44?text=?'">
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="fw-semibold text-truncate">{{ artist.artist_name }}</div>
+                            <div class="text-muted small">{{ artist.country }}</div>
+                        </div>
+                        <a href="{{ url_for('main.view_artist', artist_id=artist.artist_id) }}"
+                           class="btn btn-sm btn-outline-primary flex-shrink-0">Ver</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if artists | length > 6 %}
+                <div class="p-2 text-center">
+                    <a href="{{ url_for('main.list_artists') }}" class="small text-muted">
+                        Ver todos ({{ artists | length }})
+                    </a>
+                </div>
+                {% endif %}
+                {% else %}
+                <p class="text-muted p-3 mb-0">
+                    No hay artistas. <a href="{{ url_for('main.musicbrainz_import') }}">Importa uno</a>.
+                </p>
+                {% endif %}
             </div>
         </div>
     </div>
-    {% endfor %}
+
+    {# Eventos próximos #}
+    <div class="col-12 col-lg-6">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-calendar-event-fill me-2 text-warning"></i>Eventos</span>
+                <a href="{{ url_for('main.new_event') }}" class="btn btn-sm btn-warning">
+                    <i class="bi bi-plus-lg"></i> Nuevo
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if events %}
+                {% set badge = {
+                    'concert':   'primary',
+                    'tour':      'success',
+                    'festival':  'warning',
+                    'movie':     'danger',
+                    'tv_series': 'info'
+                } %}
+                <ul class="list-group list-group-flush">
+                    {% for event in events %}
+                    <li class="list-group-item d-flex align-items-center gap-3 py-2">
+                        {% if event.poster and not event.poster.startswith('no-poster') %}
+                        <img src="{{ event.poster }}" alt="{{ event.event_name }}"
+                             style="width:44px;height:44px;object-fit:cover;border-radius:6px;"
+                             onerror="this.style.display='none'">
+                        {% else %}
+                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:44px;height:44px;">
+                            <i class="bi bi-calendar-event text-white"></i>
+                        </div>
+                        {% endif %}
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="fw-semibold text-truncate">{{ event.event_name }}</div>
+                            <div class="text-muted small">
+                                {{ event.event_date.strftime('%d/%m/%Y') }}
+                                {% if event.location %} · {{ event.location }}{% endif %}
+                            </div>
+                        </div>
+                        <span class="badge bg-{{ badge.get(event.event_type, 'secondary') }} flex-shrink-0">
+                            {{ event.event_type | replace('_',' ') | capitalize }}
+                        </span>
+                        <a href="{{ url_for('main.view_event', event_id=event.event_id) }}"
+                           class="btn btn-sm btn-outline-warning flex-shrink-0">Ver</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <div class="p-2 text-center">
+                    <a href="{{ url_for('main.list_events') }}" class="small text-muted">
+                        Ver todos los eventos
+                    </a>
+                </div>
+                {% else %}
+                <p class="text-muted p-3 mb-0">
+                    No hay eventos. <a href="{{ url_for('main.new_event') }}">Crea el primero</a>.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Álbumes recientes #}
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span class="fw-bold"><i class="bi bi-disc-fill me-2 text-success"></i>Álbumes recientes</span>
+                <a href="{{ url_for('main.list_albums') }}" class="btn btn-sm btn-outline-success">Ver todos</a>
+            </div>
+            <div class="card-body p-0">
+                {% if albums %}
+                <ul class="list-group list-group-flush">
+                    {% for album in albums %}
+                    <li class="list-group-item d-flex align-items-center gap-3 py-2">
+                        <img src="{{ album.cover_album }}" alt="{{ album.album_title }}"
+                             style="width:44px;height:44px;object-fit:cover;border-radius:4px;"
+                             onerror="this.src='https://via.placeholder.com/44?text=?'">
+                        <div class="flex-grow-1 min-width-0">
+                            <div class="fw-semibold text-truncate">{{ album.album_title }}</div>
+                            <div class="text-muted small">
+                                {{ album.artist.artist_name }} · {{ album.release_date.year }}
+                            </div>
+                        </div>
+                        <a href="{{ url_for('main.view_album', album_id=album.album_id) }}"
+                           class="btn btn-sm btn-outline-success flex-shrink-0">Ver</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted p-3 mb-0">No hay álbumes todavía.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Accesos rápidos #}
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <span class="fw-bold"><i class="bi bi-lightning-fill me-2 text-secondary"></i>Accesos rápidos</span>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('main.new_artist') }}" class="btn btn-outline-primary text-start">
+                        <i class="bi bi-person-plus-fill me-2"></i>Añadir artista manualmente
+                    </a>
+                    <a href="{{ url_for('main.new_album') }}" class="btn btn-outline-success text-start">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Añadir álbum
+                    </a>
+                    <a href="{{ url_for('main.new_song') }}" class="btn btn-outline-info text-start">
+                        <i class="bi bi-music-note-list me-2"></i>Añadir canción
+                    </a>
+                    <a href="{{ url_for('main.new_event') }}" class="btn btn-outline-warning text-start">
+                        <i class="bi bi-calendar-plus-fill me-2"></i>Añadir evento
+                    </a>
+                    <a href="{{ url_for('main.new_product') }}" class="btn btn-outline-danger text-start">
+                        <i class="bi bi-bag-plus-fill me-2"></i>Añadir producto a la tienda
+                    </a>
+                    <a href="{{ url_for('main.musicbrainz_import') }}" class="btn btn-outline-secondary text-start">
+                        <i class="bi bi-cloud-download-fill me-2"></i>Importar desde MusicBrainz
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
-{% endif %}
 {% endblock %}

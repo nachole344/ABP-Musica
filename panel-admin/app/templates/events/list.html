@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Eventos{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1><i class="bi bi-calendar-event-fill me-2 text-warning"></i>Eventos</h1>
+    <a href="{{ url_for('main.new_event') }}" class="btn btn-warning">+ Nuevo evento</a>
+</div>
+
+{# Filtro por tipo #}
+<div class="d-flex gap-2 flex-wrap mb-3">
+    <a href="{{ url_for('main.list_events', artist_id=artist_filter) }}"
+       class="btn btn-sm {{ 'btn-dark' if not type_filter else 'btn-outline-dark' }}">
+        Todos los tipos
+    </a>
+    {% for t in event_types %}
+    <a href="{{ url_for('main.list_events', type=t, artist_id=artist_filter) }}"
+       class="btn btn-sm {{ 'btn-dark' if type_filter == t else 'btn-outline-secondary' }}">
+        {{ t.replace('_', ' ').title() }}
+    </a>
+    {% endfor %}
+</div>
+
+{# Filtro por artista #}
+<div class="mb-4">
+    <select class="form-select form-select-sm" style="max-width:260px;"
+            onchange="window.location.href='{{ url_for('main.list_events') }}?type={{ type_filter }}&artist_id=' + this.value">
+        <option value="">Todos los artistas</option>
+        {% for a in artists %}
+        <option value="{{ a.artist_id }}" {{ 'selected' if artist_filter == a.artist_id|string else '' }}>
+            {{ a.artist_name }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+{% set badge = {
+    'concert':   'primary',
+    'tour':      'success',
+    'festival':  'warning',
+    'movie':     'danger',
+    'tv_series': 'info'
+} %}
+
+{% if events %}
+<div class="row g-3">
+    {% for event in events %}
+    <div class="col-md-4 col-sm-6">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="position-relative">
+                {% if event.poster and not event.poster.startswith('no-poster') %}
+                <img src="{{ event.poster }}" class="card-img-top" alt="{{ event.event_name }}"
+                     style="height:200px;object-fit:cover;"
+                     onerror="this.src='https://via.placeholder.com/400x200?text=Sin+póster'">
+                {% else %}
+                <div class="d-flex align-items-center justify-content-center bg-secondary text-white"
+                     style="height:200px;">
+                    <i class="bi bi-calendar-event" style="font-size:3rem;opacity:.5"></i>
+                </div>
+                {% endif %}
+                <span class="position-absolute top-0 end-0 m-2 badge bg-{{ badge.get(event.event_type, 'secondary') }}">
+                    {{ event.event_type.replace('_', ' ').title() }}
+                </span>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h6 class="card-title fw-bold mb-1">{{ event.event_name }}</h6>
+                <p class="text-muted small mb-1">
+                    <a href="{{ url_for('main.view_artist', artist_id=event.artist.artist_id) }}"
+                       class="text-decoration-none text-muted">
+                        <i class="bi bi-person-fill me-1"></i>{{ event.artist.artist_name }}
+                    </a>
+                </p>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-calendar me-1"></i>{{ event.event_date.strftime('%d/%m/%Y') }}
+                    {% if event.location %}
+                    <br><i class="bi bi-geo-alt me-1"></i>{{ event.location }}
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('main.view_event', event_id=event.event_id) }}"
+                   class="btn btn-warning btn-sm mt-auto mt-2">Ver evento</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center text-muted py-5">
+    <i class="bi bi-calendar-x" style="font-size:3rem;opacity:.35"></i>
+    <p class="mt-3">No hay eventos{% if type_filter %} de tipo <strong>{{ type_filter }}</strong>{% endif %}.</p>
+    <a href="{{ url_for('main.new_event') }}" class="btn btn-warning">+ Añadir evento</a>
+</div>
+{% endif %}
+
+{% endblock %}
