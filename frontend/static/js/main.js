@@ -10,184 +10,6 @@ let cart = []; // Array para guardar los preductos que se desean comprar
 let activeCategory = 'all';
 let activeArtist = 'all';
 
-// MOCK DATA temporal para provar el funcionamiento de los productos
-const mockProducts = [
-    {
-        product_id: 1,
-        product_name: "Álbum 'Echoes en la Noche'",
-        product_type: "album",
-        price: 15.99,
-        image_url: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        product_id: 2,
-        product_name: "Vinilo Edición Especial Clásicos",
-        product_type: "vinyl",
-        price: 35.50,
-        image_url: "https://images.unsplash.com/photo-1538688423619-a81d3f23454b?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        product_id: 3,
-        product_name: "Camiseta Tour 2024 (Negra)",
-        product_type: "clothing",
-        price: 25.00,
-        image_url: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        product_id: 4,
-        product_name: "Tote Bag Sostenible Algodón",
-        product_type: "tote_bag",
-        price: 12.00,
-        image_url: "https://images.unsplash.com/photo-1597423235375-14f7623a31eb?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        product_id: 5,
-        product_name: "Sudadera SoundScape Premium",
-        product_type: "clothing",
-        price: 45.00,
-        image_url: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&q=80&w=400"
-    },
-    {
-        product_id: 6,
-        product_name: "Pin Metálico Logo Banda",
-        product_type: "pin",
-        price: 5.50,
-        image_url: "https://images.unsplash.com/photo-1611078716388-3485ba8051a8?auto=format&fit=crop&q=80&w=400"
-    }
-];
-
-const mockOrders = [
-    {
-        order_id: 1,
-        order_date: "2026-03-15",
-        total_price: 21.49,
-        status: "delivered"
-    },
-    {
-        order_id: 2,
-        order_date: "2026-05-20",
-        total_price: 85.50,
-        status: "paid"
-    },
-    {
-        order_id: 3,
-        order_date: "2026-05-21",
-        total_price: 87.50,
-        status: "pending"
-    },
-];
-
-const mockOrderItems = [
-    // --- PEDIDO 1 (Total: 21.49) ---
-    {
-        order_item_id: 1,
-        order_id: 1,
-        product_id: 1, // Álbum 'Echoes en la Noche'
-        quantity: 1,
-        price: 15.99
-    },
-    {
-        order_item_id: 2,
-        order_id: 1,
-        product_id: 6, // Pin Metálico Logo Banda
-        quantity: 1,
-        price: 5.50
-    },
-
-    // --- PEDIDO 2 (Total: 85.50) ---
-    {
-        order_item_id: 3,
-        order_id: 2,
-        product_id: 2, // Vinilo Edición Especial Clásicos
-        quantity: 1,
-        price: 35.50
-    },
-    {
-        order_item_id: 4,
-        order_id: 2,
-        product_id: 3, // Camiseta Tour 2024 (Negra)
-        quantity: 2,
-        price: 25.00
-    },
-
-    // --- PEDIDO 3 (Total: 87.50) ---
-    {
-        order_item_id: 5,
-        order_id: 3,
-        product_id: 5, // Sudadera SoundScape Premium
-        quantity: 1,
-        price: 45.00
-    },
-    {
-        order_item_id: 6,
-        order_id: 3,
-        product_id: 3, // Camiseta Tour 2024 (Negra)
-        quantity: 1,
-        price: 25.00
-    },
-    {
-        order_item_id: 7,
-        order_id: 3,
-        product_id: 4, // Tote Bag Sostenible Algodón
-        quantity: 1,
-        price: 12.00
-    },
-    {
-        order_item_id: 8,
-        order_id: 3,
-        product_id: 6, // Pin Metálico Logo Banda
-        quantity: 1,
-        price: 5.50
-    }
-];
-
-const mockEvents = [
-    {
-        event_id: 1,
-        artist_id: 1,
-        event_name: "Nova Pulse — Live in Barcelona",
-        event_type: "CONCERT",
-        event_date: "2025-06-12",
-        location: "Sala Apolo, Barcelona",
-        poster: "https://images.unsplash.com/photo-1518972559570-7cc1309f3229"
-    },
-    {
-        event_id: 2,
-        artist_id: 2,
-        event_name: "Echo Drift — European Tour",
-        event_type: "TOUR",
-        event_date: "2025-09-03",
-        location: "O2 Arena, London",
-        poster: "https://images.unsplash.com/photo-1507874457470-272b3c8d8ee2"
-    },
-    {
-        event_id: 3,
-        artist_id: 3,
-        event_name: "SoundScape Festival 2025",
-        event_type: "FESTIVAL",
-        event_date: "2025-08-21",
-        location: "Parc del Fòrum, Barcelona",
-        poster: "https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf"
-    },
-    {
-        event_id: 4,
-        artist_id: null,
-        event_name: "Industria Musical — Mesa Redonda",
-        event_type: "TALK",
-        event_date: "2025-11-10",
-        location: "Fira Barcelona — Hall 5",
-        poster: "https://images.unsplash.com/photo-1515165562835-c4c1b4d1f4d5"
-    },
-    {
-        event_id: 5,
-        artist_id: 1,
-        event_name: "Nova Pulse — Meet & Greet",
-        event_type: "EXTRA",
-        event_date: "2025-06-13",
-        location: "FNAC Triangle, Barcelona",
-        poster: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e"
-    }
-];
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('SoundScape: Inicializando aplicación...');
@@ -267,8 +89,7 @@ async function fetchProducts() {
         const data = await response.json();
 
         if (data.length === 0) {
-            console.warn('La base de datos está vacía. Cargando datos simulados (Mock)...');
-            productsData = mockProducts;
+            console.warn('La base de datos está vacía.');
         } else {
             productsData = data;
         }
@@ -277,8 +98,7 @@ async function fetchProducts() {
 
     } catch (error) {
         // Si el backend ni siquiera está encendido, caemos aquí
-        console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
-        productsData = mockProducts;
+        console.warn('Backend inactivo.');
         renderProducts();
     }
 }
@@ -289,8 +109,7 @@ async function fetchOrders() {
         const data = await response.json();
 
         if (data.length === 0) {
-            console.warn('La base de datos está vacía. Cargando datos simulados (Mock)...');
-            ordersData = mockOrders;
+            console.warn('La base de datos está vacía.');
         } else {
             ordersData = data;
         }
@@ -299,7 +118,7 @@ async function fetchOrders() {
 
     } catch (error) {
         // Si el backend ni siquiera está encendido, caemos aquí
-        console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
+        console.warn('Backend inactivo.');
         ordersData = mockOrders;
         fetchOrdersItems();
     }
@@ -311,8 +130,7 @@ async function fetchOrdersItems() {
         const data = await response.json();
 
         if (data.length === 0) {
-            console.warn('La base de datos está vacía. Cargando datos simulados (Mock)...');
-            orderItemsData = mockOrderItems;
+            console.warn('La base de datos está vacía.');
         } else {
             orderItemsData = data;
         }
@@ -322,8 +140,7 @@ async function fetchOrdersItems() {
 
     } catch (error) {
         // Si el backend ni siquiera está encendido, caemos aquí
-        console.warn('Backend inactivo. Cargando datos simulados de forma offline...');
-        orderItemsData = mockOrderItems;
+        console.warn('Backend inactivo.');
         renderOrders();
         renderFeaturedProducts();
     }
@@ -333,11 +150,9 @@ async function fetchEvents() {
     try {
         const response = await fetch('https://musehub.mom/api/events/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
-        eventsData = mockEvents;
         renderEvents();
     } catch (error) {
         console.warn('Cargando mock data para eventos...');
-        eventsData = mockEvents;
         renderEvents();
     }
 }
