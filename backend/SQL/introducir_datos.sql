@@ -1,111 +1,70 @@
--- =====================
--- ARTISTS
--- =====================
 INSERT INTO artists 
-(real_name, artist_name, birth_date, debut, country, social_media, image, description)
+(real_name, artist_name, birth_date, debut, country, social_media, image, mb_id)
 VALUES
-('Rosalía Vila Tobella', 'Rosalía', '1992-09-25', '2017-01-01', 'Spain',
-'https://instagram.com/rosalia.vt',
-'https://image.rosalia.jpg',
-'Spanish singer known for blending flamenco with pop and urban music'),
+('Dua Lipa', 'Dua Lipa', '1995-08-22', '2015-01-01', 'UK',
+'https://instagram.com/dualipa',
+'https://image.dualipa.jpg',
+'123e4567-e89b-12d3-a456-426614174000');
 
-('Abel Makkonen Tesfaye', 'The Weeknd', '1990-02-16', '2011-01-01', 'Canada',
-'https://instagram.com/theweeknd',
-'https://image.weeknd.jpg',
-'Canadian singer known for R&B and pop music');
-
-
--- =====================
--- ALBUMS
--- =====================
-INSERT INTO albums
-(artist_id, album_title, release_date, total_track, cover_album, spotify)
+INSERT INTO artists 
+(real_name, artist_name, birth_date, debut, country, social_media, image, mb_id)
 VALUES
-(1, 'Motomami', '2022-03-18', 16,
-'https://cover.motomami.jpg',
-'https://spotify.com/motomami'),
-
-(2, 'After Hours', '2020-03-20', 14,
-'https://cover.afterhours.jpg',
-'https://spotify.com/afterhours');
+('Dua Lipa', 'Dua Lipa', '1995-08-22', '2015-01-01', 'UK',
+'https://instagram.com/dualipa',
+'https://image.dualipa.jpg',
+'123e4567-e89b-12d3-a456-426614174000');
 
 
--- =====================
--- SONGS
--- =====================
 INSERT INTO songs
-(album_id, song_title, duration, video_url, cover_song)
+(album_id, song_title, duration, video_url, cover_song, mb_song_id)
 VALUES
-(1, 'Saoko', '00:02:17',
-'https://youtube.com/saoko',
-'https://cover.saoko.jpg'),
-
-(2, 'Blinding Lights', '00:03:20',
-'https://youtube.com/blindinglights',
-'https://cover.blindinglights.jpg');
+(1, 'Levitating', '00:03:23',
+'https://youtube.com/levitating',
+'https://cover.levitating.jpg',
+'323e4567-e89b-12d3-a456-426614174000');
 
 
--- =====================
--- PRODUCTS
--- =====================
+
 INSERT INTO products
 (artist_id, product_name, product_type, price, stock, image_url)
 VALUES
-(1, 'Motomami Vinyl', 'vinyl', 29.99, 50,
-'https://product.motomami.vinyl.jpg'),
+(1, 'Future Nostalgia Vinyl', 'vinyl', 24.99, 40,
+'https://product.fn.vinyl.jpg');
 
-(2, 'After Hours Hoodie', 'clothing', 59.99, 30,
-'https://product.afterhours.hoodie.jpg');
-
-
--- =====================
--- EVENTS
--- =====================
 INSERT INTO events
 (artist_id, event_name, event_type, event_date, location, poster)
 VALUES
-(1, 'Motomami World Tour', 'tour', '2022-07-01', 'Barcelona',
-'https://poster.motomami.jpg'),
-
-(2, 'After Hours Tour', 'tour', '2022-08-15', 'Los Angeles',
-'https://poster.afterhours.jpg');
+(1, 'Future Nostalgia Tour', 'tour', '2023-06-10', 'London',
+'https://poster.fn.jpg');
 
 
--- =====================
--- CARTS
--- =====================
 INSERT INTO carts
 (product_id, quantity)
 VALUES
-(1, 2),
-(2, 1);
+(1, 2);
 
-
--- =====================
--- ORDERS
--- =====================
 INSERT INTO orders
 (order_date, total_price, status)
 VALUES
-('2024-01-10', 89.98, 'paid'),
-('2024-01-12', 59.99, 'shipped');
+('2024-02-01', 49.98, 'paid');
 
-
--- =====================
--- ORDER ITEMS
--- =====================
 INSERT INTO order_items
 (order_id, product_id, quantity, price)
 VALUES
-(1, 1, 2, 29.99),
-(2, 2, 1, 59.99);
+(1, 1, 2, 24.99);
 
-
--- =====================
--- USERS
--- =====================
 INSERT INTO users
 (username, password)
 VALUES
-('user1', 'user123'),
-('admin', 'admin123');
+('test_user', '123456');
+
+
+DELETE FROM order_items;
+DELETE FROM orders;
+DELETE FROM carts;
+DELETE FROM products;
+DELETE FROM songs;
+DELETE FROM albums;
+DELETE FROM events;
+DELETE FROM artists;
+DELETE FROM users;
