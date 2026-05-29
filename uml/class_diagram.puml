@@ -2,35 +2,41 @@
 ' --- CONFIGURACIÓN VISUAL ---
 
 skinparam linetype ortho
-skinparam nodesep 50
-skinparam ranksep 50
+skinparam nodesep 70
+skinparam ranksep 100
+skinparam padding 5
 
 ' --- ENTIDADES ---
 package "ABP-Musica" {
+
   package "backend" {
-    enum product_type_enum {
-      album
-      vinyl
-      clothing
-      tote_bag
-      pin
+    package "enums" {
+      enum product_type_enum {
+        album
+        vinyl
+        clothing
+        tote_bag
+        pin
+      }
+
+      enum event_type_enum {
+        concert
+        tour
+        festival
+        movie
+        tv_series
+      }
+
+      enum order_status_enum {
+        pending
+        paid
+        shipped
+        delivered
+        cancelled
+      }
+
     }
 
-    enum event_type_enum {
-      concert
-      tour
-      festival
-      movie
-      tv_series
-    }
-
-    enum order_status_enum {
-      pending
-      paid
-      shipped
-      delivered
-      cancelled
-    }
     entity "artists" as artists {
       * artist_id : INT <<PK>>
       --
@@ -43,6 +49,8 @@ package "ABP-Musica" {
       * image : TEXT
       o description : TEXT
       * mb_id : UUID
+      --
+      + to_dict() : Dict
     }
 
     entity "albums" as albums {
@@ -55,6 +63,8 @@ package "ABP-Musica" {
       * cover_album : TEXT
       * spotify : TEXT
       * mb_album_id : UUID
+      --
+      + to_dict() : Dict
     }
 
     entity "songs" as songs {
@@ -66,6 +76,8 @@ package "ABP-Musica" {
       o video_url : TEXT
       * cover_song : TEXT
       * mb_song_id : UUID
+      --
+      + to_dict() : Dict
     }
 
     entity "products" as products {
@@ -77,6 +89,8 @@ package "ABP-Musica" {
       * price : DECIMAL(10,2)
       * stock : INT
       * image_url : TEXT
+      --
+      + to_dict() : Dict
     }
 
     entity "events" as events {
@@ -88,6 +102,8 @@ package "ABP-Musica" {
       * event_date : DATE
       o location : VARCHAR(100)
       * poster : TEXT
+      --
+      + to_dict() : Dict
     }
 
     entity "carts" as carts {
@@ -119,14 +135,100 @@ package "ABP-Musica" {
       --
       * username : VARCHAR(50)
       * password : VARCHAR(50)
+      * is_admin : BOOLEAN
       * date : TIMESTAMP
+      --
+      + to_dict() : Dict
     }
 
+    ' Relaciones de base de datos '
+    artists ||--o{ albums
+    artists ||--o{ products
+    artists ||--o{ events
+    albums ||--o{ songs
+    orders ||--o{ order_items
+    products ||--o{ order_items
+    products ||--o{ carts
+    }
+
+    package "frontend (mainJS separado por módulos lógicos)" {
+
+    class "GlobalState" as state << (M,#FFCA28) State >> {
+      - currentArtistIndex : int
+      - artistsData : Array
+      - productsData : Array
+      - eventsData : Array
+      - ordersData : Array
+      - orderItemsData : Array
+      - cart : Array
+    }
+
+    class "APIFetcher" as api << (M,#FFCA28) Service >> {
+      + fetchArtists()
+      + fetchProducts()
+      + fetchOrders()
+      + fetchOrdersItems()
+      + fetchEvents()
+    }
+
+    class "Shop & Cart" as shop << (M,#FFCA28) Controller >> {
+      - activeCategory : String
+      - activeArtist : String
+      --
+      + filterProducts(type)
+      + filterByArtist(id)
+      + applyFilters()
+      + populateArtistFilter()
+      + openCart()
+      + closeCart()
+      + addToCart(id)
+      + renderCart()
+      + removeFromCart(id)
+      + emptyCart()
+      + updateCartCounter()
+      + goToOrders()
+    }
+
+    class "UI & Views" as ui << (M,#FFCA28) View >> {
+      + showSection(id)
+      + toggleMobileMenu()
+      + renderArtistSlides()
+      + renderEvents()
+      + renderProducts(data)
+      + renderFeaturedProducts()
+      + renderOrders()
+      + viewArtistCatalog(index)
+      + closeCatalog()
+      + nextArtist()
+      + prevArtist()
+      + updateSlide(index)
+      + showPrviousOrders()
+      + closeOrdersModal()
+    }
+
+    class "AuthManager" as auth << (M,#FFCA28) Controller >> {
+      + showLogin()
+      + hideLogin()
+      + handleLogin(event)
+      + handleLogout()
+      + checkLoginStatus()
+      + updateUIForLoggedInUser(user)
+      + updateUIForLoggedOutUser()
+    }
+
+    ' Forzar distribución horizontal de los módulos del frontend '
+    state -[hidden]right-> api
+    api -[hidden]right-> shop
+    shop -[hidden]right-> ui
+    ui -[hidden]right-> auth
   }
 
-  package "frontend" {
-    
-  }
+  ' Dependencias entre los submódulos del Frontend y el Backend '
+  api ..> artists : Consulta API (/api/artists/)
+  api ..> products : Consulta API (/api/shop/)
+  api ..> events : Consulta API (/api/events/)
+  api ..> orders : Consulta API (/api/orders/)
+  auth ..> users : Autenticación (/api/auth/)
+
 }
-
 @enduml
