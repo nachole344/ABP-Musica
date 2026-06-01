@@ -3,11 +3,17 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
+venv-e2e/
 .env
 
 # Web
 node_modules/
 .DS_Store
+
+# Media (large binary files)
+*.mp4
+*.mp3
+*.webm
 
 # IDEs
 .vscode/
