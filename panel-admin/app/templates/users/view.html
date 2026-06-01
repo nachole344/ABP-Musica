@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }}{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{{ url_for('main.list_users') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <h1 class="mb-0">
+        <i class="bi bi-person-circle me-2 text-primary"></i>{{ user.username }}
+    </h1>
+    <span class="badge {{ 'bg-danger' if user.role == 'admin' else 'bg-secondary' }} fs-6">
+        {{ user.role }}
+    </span>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body p-4">
+                <h5 class="card-title text-muted text-uppercase small fw-bold mb-3">Datos del usuario</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">ID</dt>
+                    <dd class="col-sm-8">{{ user.user_id }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Usuario</dt>
+                    <dd class="col-sm-8 fw-semibold">{{ user.username }}</dd>
+
+                    <dt class="col-sm-4 text-muted">Rol</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge {{ 'bg-danger' if user.role == 'admin' else 'bg-secondary' }}">
+                            {{ user.role }}
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted">Registrado</dt>
+                    <dd class="col-sm-8">{{ user.date.strftime('%d/%m/%Y %H:%M') if user.date else '—' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4 d-flex gap-2">
+    <a href="{{ url_for('main.edit_user', user_id=user.user_id) }}" class="btn btn-primary">
+        <i class="bi bi-pencil me-1"></i>Editar
+    </a>
+    {% if user.user_id != session.get('user_id') %}
+    <form action="{{ url_for('main.delete_user', user_id=user.user_id) }}" method="POST" class="d-inline"
+          onsubmit="return confirm('¿Eliminar al usuario {{ user.username }}?')">
+        <button type="submit" class="btn btn-danger">
+            <i class="bi bi-trash me-1"></i>Eliminar
+        </button>
+    </form>
+    {% endif %}
+    <a href="{{ url_for('main.list_users') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Volver
+    </a>
+</div>
+
+{% endblock %}

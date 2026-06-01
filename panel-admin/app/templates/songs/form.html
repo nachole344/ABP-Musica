@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if song else "Nueva" }} Canción{% endblock %}
+{% block content %}
+<h1>{{ "Editar" if song else "Nueva" }} Canción</h1>
+
+{% if not song %}
+<div class="card mb-4 border-warning">
+    <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-cloud-download me-1"></i>Buscar en MusicBrainz</h5>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Nombre del álbum</label>
+                <input type="text" id="mb-album-name" class="form-control" placeholder="ej. OK Computer">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Nombre de la canción</label>
+                <input type="text" id="mb-song-name" class="form-control" placeholder="ej. Karma Police">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">O UUID del release</label>
+                <input type="text" id="mb-release-id" class="form-control" placeholder="ej. b84ee12a-...">
+            </div>
+        </div>
+        <div class="mt-3"><button class="btn btn-warning" onclick="mbSearchSongs()">Buscar y seleccionar</button></div>
+        <div id="mb-song-results" class="mt-3"></div>
+    </div>
+</div>
+{% endif %}
+
+<form method="POST">
+    <div class="mb-3">
+        <label class="form-label">Álbum</label>
+        <select name="album_id" id="f-album_id" class="form-select" required>
+            <option value="">Seleccionar...</option>
+            {% for a in albums %}
+            <option value="{{ a.album_id }}" {{ "selected" if song and song.album_id == a.album_id else "" }}>{{ a.album_title }} - {{ a.artist.artist_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Título</label>
+        <input type="text" name="song_title" id="f-song_title" class="form-control" value="{{ song.song_title if song else '' }}" required>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Duración (HH:MM:SS)</label>
+            <input type="text" name="duration" id="f-duration" class="form-control" value="{{ song.duration if song else '' }}" placeholder="00:03:30" required>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">URL de vídeo</label>
+        <input type="text" name="video_url" id="f-video_url" class="form-control" value="{{ song.video_url if song else '' }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Portada (URL)</label>
+        <input type="text" name="cover_song" id="f-cover_song" class="form-control" value="{{ song.cover_song if song else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">MusicBrainz Song ID (UUID)</label>
+        <input type="text" name="mb_song_id" id="f-mb_song_id" class="form-control" value="{{ song.mb_song_id if song else '' }}" required>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="{{ url_for('main.list_songs') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function mbSearchSongs() {
+    const albumName = document.getElementById("mb-album-name").value.trim();
+    const songName  = document.getElementById("mb-song-name").value.trim();
+    const mbRelease = document.getElementById("mb-release-id").value.trim();
+    if (!albumName && !songName && !mbRelease) return alert("Introduce nombre de álbum, canción o UUID del release");
+    const area = document.getElementById("mb-song-results");
+    area.innerHTML = '<div class="text-muted">Buscando...</div>';
+    try {
+        const params = new URLSearchParams({ album_name: albumName, song_name: songName, mb_release: mbRelease });
+        const r = await fetch(`/admin/api/musicbrainz/search/songs?${params}`);
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        const list = Array.isArray(d) ? d : [d];
+        area.innerHTML = '<div class="list-group mt-2"></div>';
+        list.forEach(item => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "list-group-item list-group-item-action";
+            btn.innerHTML = `<strong>${item.song_title}</strong> <small class="text-muted">${item.duration} · ${item._album_title || ""}</small>`;
+            btn.onclick = () => {
+                document.getElementById("f-song_title").value = item.song_title || "";
+                document.getElementById("f-duration").value   = item.duration   || "";
+                document.getElementById("f-video_url").value  = item.video_url  || "";
+                document.getElementById("f-cover_song").value = item.cover_song || "";
+                document.getElementById("f-mb_song_id").value = item.mb_song_id || "";
+                area.innerHTML = '<div class="text-success mt-2">✓ Campos rellenados desde MusicBrainz</div>';
+            };
+            area.querySelector(".list-group").appendChild(btn);
+        });
+    } catch (e) {
+        area.innerHTML = `<div class="alert alert-danger mt-2">${e.message}</div>`;
+    }
+}
+</script>
+{% endblock %}

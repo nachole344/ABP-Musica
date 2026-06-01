@@ -1,11 +1,14 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify
+from ..models.artist import Artist
 
 artists_bp = Blueprint('artists', __name__)
 
 @artists_bp.route('/', methods=['GET'])
 def get_artists():
-    return jsonify({"message": "List of artists (placeholder)"}), 200
+    artists = Artist.query.all()
+    return jsonify([artist.to_dict() for artist in artists]), 200
 
 @artists_bp.route('/<int:id>', methods=['GET'])
 def get_artist(id):
-    return jsonify({"message": f"Artist {id} (placeholder)"}), 200
+    artist = Artist.query.get_or_404(id)
+    return jsonify(artist.to_dict()), 200

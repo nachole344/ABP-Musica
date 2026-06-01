@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ album.album_title }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <img src="{{ album.cover_album }}" class="img-fluid rounded" alt="{{ album.album_title }}" onerror="this.src='https://via.placeholder.com/400x400?text=No+Cover'">
+    </div>
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-start">
+            <h1>{{ album.album_title }}</h1>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('main.edit_album', album_id=album.album_id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form action="{{ url_for('main.delete_album', album_id=album.album_id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar álbum?')">
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+            </div>
+        </div>
+        <hr>
+        <p><strong>Artista:</strong> <a href="{{ url_for('main.view_artist', artist_id=album.artist.artist_id) }}">{{ album.artist.artist_name }}</a></p>
+        <p><strong>Lanzamiento:</strong> {{ album.release_date }}</p>
+        <p><strong>Pistas:</strong> {{ album.total_track }}</p>
+        {% if album.spotify and album.spotify.startswith('http') %}
+        <p><strong>Spotify:</strong> <a href="{{ album.spotify }}" target="_blank">Escuchar</a></p>
+        {% endif %}
+    </div>
+</div>
+
+<h2 class="mt-4">Canciones</h2>
+{% if album.songs.count() > 0 %}
+<table class="table table-striped">
+    <thead><tr><th>#</th><th>Título</th><th>Duración</th><th></th></tr></thead>
+    <tbody>
+        {% for song in album.songs %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ song.song_title }}</td>
+            <td>{{ song.duration }}</td>
+            <td><a href="{{ url_for('main.view_song', song_id=song.song_id) }}" class="btn btn-sm btn-info text-white">Ver</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">Sin canciones.</p>
+{% endif %}
+{% endblock %}

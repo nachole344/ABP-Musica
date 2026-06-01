@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Inicio - Artist App{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4">Artist App</h1>
+    <p class="lead">Catálogo de artistas, álbumes y canciones</p>
+    <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="{{ url_for('admin.list_artists') }}" class="btn btn-primary btn-lg">Artistas</a>
+        <a href="{{ url_for('admin.list_albums') }}" class="btn btn-success btn-lg">Álbumes</a>
+        <a href="{{ url_for('admin.list_songs') }}" class="btn btn-info btn-lg text-white">Canciones</a>
+        <a href="{{ url_for('admin.musicbrainz_import') }}" class="btn btn-warning btn-lg">Import MusicBrainz</a>
+    </div>
+</div>
+
+<h2 class="mb-3">Artistas</h2>
+<div class="row">
+    {% for artist in artists %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <img src="{{ artist.image }}" class="card-img-top" alt="{{ artist.artist_name }}" style="height:200px;object-fit:cover;" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
+            <div class="card-body">
+                <h5 class="card-title">{{ artist.artist_name }}</h5>
+                <p class="card-text text-muted">{{ artist.country }}</p>
+                <a href="{{ url_for('admin.view_artist', artist_id=artist.artist_id) }}" class="btn btn-sm btn-primary">Ver</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No hay artistas todavía. <a href="{{ url_for('admin.musicbrainz_import') }}">Importa uno</a>.</p>
+    {% endfor %}
+</div>
+
+{% if albums %}
+<h2 class="mb-3 mt-4">Álbumes recientes</h2>
+<div class="row">
+    {% for album in albums %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <img src="{{ album.cover_album }}" class="card-img-top" alt="{{ album.album_title }}" style="height:200px;object-fit:cover;" onerror="this.src='https://via.placeholder.com/400x200?text=No+Cover'">
+            <div class="card-body">
+                <h5 class="card-title">{{ album.album_title }}</h5>
+                <p class="card-text text-muted">{{ album.artist.artist_name }}</p>
+                <a href="{{ url_for('admin.view_album', album_id=album.album_id) }}" class="btn btn-sm btn-success">Ver</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

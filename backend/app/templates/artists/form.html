@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if artist else "Nuevo" }} Artista{% endblock %}
+{% block content %}
+<h1>{{ "Editar" if artist else "Nuevo" }} Artista</h1>
+
+{% if not artist %}
+<div class="card mb-4 border-warning">
+    <div class="card-body">
+        <h5 class="card-title"><i class="bi bi-cloud-download me-1"></i>Buscar en MusicBrainz</h5>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Nombre del artista</label>
+                <input type="text" id="mb-search-name" class="form-control" placeholder="ej. Radiohead">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">O UUID de MusicBrainz</label>
+                <input type="text" id="mb-search-id" class="form-control" placeholder="ej. a74b1b7f-...">
+            </div>
+        </div>
+        <div class="mt-3">
+            <button class="btn btn-warning" onclick="mbSearchArtist()">Buscar y rellenar</button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<form method="POST">
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre artístico</label>
+            <input type="text" name="artist_name" id="f-artist_name" class="form-control" value="{{ artist.artist_name if artist else '' }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Nombre real</label>
+            <input type="text" name="real_name" id="f-real_name" class="form-control" value="{{ artist.real_name if artist else '' }}" required>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Fecha de nacimiento</label>
+            <input type="date" name="birth_date" id="f-birth_date" class="form-control" value="{{ artist.birth_date if artist else '' }}" required>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">Debut</label>
+            <input type="date" name="debut" id="f-debut" class="form-control" value="{{ artist.debut if artist else '' }}" required>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label class="form-label">País</label>
+            <input type="text" name="country" id="f-country" class="form-control" value="{{ artist.country if artist else '' }}" required>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Redes sociales (URL)</label>
+        <input type="text" name="social_media" id="f-social_media" class="form-control" value="{{ artist.social_media if artist else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Imagen (URL)</label>
+        <input type="text" name="image" id="f-image" class="form-control" value="{{ artist.image if artist else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">MusicBrainz ID (UUID)</label>
+        <input type="text" name="mb_id" id="f-mb_id" class="form-control" value="{{ artist.mb_id if artist else '' }}" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Descripción</label>
+        <textarea name="description" id="f-description" class="form-control" rows="3">{{ artist.description if artist else '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar</button>
+    <a href="{{ url_for('admin.list_artists') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function mbSearchArtist() {
+    const name = document.getElementById("mb-search-name").value.trim();
+    const mbid = document.getElementById("mb-search-id").value.trim();
+    if (!name && !mbid) return alert("Introduce un nombre o UUID");
+    try {
+        const r = await fetch(`/admin/api/musicbrainz/search/artist?name=${encodeURIComponent(name)}&mb_id=${encodeURIComponent(mbid)}`);
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        document.getElementById("f-artist_name").value = d.artist_name || "";
+        document.getElementById("f-real_name").value   = d.real_name   || "";
+        document.getElementById("f-birth_date").value  = d.birth_date  || "";
+        document.getElementById("f-debut").value       = d.debut       || "";
+        document.getElementById("f-country").value     = d.country     || "";
+        document.getElementById("f-social_media").value = d.social_media || "";
+        document.getElementById("f-image").value       = d.image       || "";
+        document.getElementById("f-mb_id").value       = d.mb_id       || "";
+        document.getElementById("f-description").value = d.description || "";
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}{{ "Editar" if product else "Nuevo" }} Producto{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-4">
+    <a href="{{ url_for('main.list_products') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i>
+    </a>
+    <h1 class="mb-0">{{ "Editar" if product else "Nuevo" }} Producto</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <form method="POST">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Artista</label>
+                        <select name="artist_id" class="form-select" required>
+                            <option value="">Seleccionar artista...</option>
+                            {% for a in artists %}
+                            <option value="{{ a.artist_id }}"
+                                {{ "selected" if product and product.artist_id == a.artist_id else "" }}>
+                                {{ a.artist_name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre del producto</label>
+                        <input type="text" name="product_name" class="form-control"
+                               value="{{ product.product_name if product else '' }}"
+                               placeholder="ej. Camiseta OK Computer" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tipo de producto</label>
+                        <select name="product_type" class="form-select" required>
+                            {% for t in product_types %}
+                            <option value="{{ t }}"
+                                {{ "selected" if product and product.product_type == t else "" }}>
+                                {{ t.replace('_', ' ').title() }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Precio (€)</label>
+                            <div class="input-group">
+                                <input type="number" name="price" class="form-control"
+                                       value="{{ product.price if product else '' }}"
+                                       step="0.01" min="0" placeholder="0.00" required>
+                                <span class="input-group-text">€</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Stock</label>
+                            <input type="number" name="stock" class="form-control"
+                                   value="{{ product.stock if product else '' }}"
+                                   min="0" placeholder="0" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">URL de imagen</label>
+                        <input type="text" name="image_url" id="image_url_input" class="form-control"
+                               value="{{ product.image_url if product else '' }}"
+                               placeholder="https://..." required
+                               oninput="previewImage(this.value)">
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning fw-bold">
+                            <i class="bi bi-check-lg me-1"></i>Guardar
+                        </button>
+                        <a href="{{ url_for('main.list_products') }}" class="btn btn-outline-secondary">Cancelar</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 text-center">
+                <p class="text-muted small fw-semibold text-uppercase mb-2">Vista previa</p>
+                <img id="image-preview"
+                     src="{{ product.image_url if product else '' }}"
+                     class="img-fluid rounded"
+                     style="max-height:300px;object-fit:contain;"
+                     onerror="this.src='https://via.placeholder.com/400x300?text=Sin+imagen'"
+                     alt="Preview">
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function previewImage(url) {
+    const img = document.getElementById("image-preview");
+    if (url) {
+        img.src = url;
+    } else {
+        img.src = "https://via.placeholder.com/400x300?text=Sin+imagen";
+    }
+}
+</script>
+{% endblock %}
