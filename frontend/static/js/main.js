@@ -199,7 +199,8 @@ async function fetchEvents() {
     try {
         const response = await fetch('/api/events/', { credentials: 'include' });
         if (!response.ok) throw new Error('API no disponible');
-        eventsData = mockEvents;
+        const data = await response.json();
+        eventsData = data.length === 0 ? mockEvents : data;
         renderEvents();
     } catch (error) {
         console.warn('Cargando mock data para eventos...');
